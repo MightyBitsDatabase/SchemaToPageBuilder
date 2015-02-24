@@ -52,7 +52,11 @@ class {{model.classname}} extends Model {
 
   public function {{this.name}}()
   {
-    return $this->{{this.relationtype}}('{{this.relatedmodel}}');
+    {{#if this.usenamespace}}    
+    return $this->{{this.relationtype}}('\{{this.usenamespace}}\\{{this.relatedmodel}}');
+    {{else}}
+    return $this->{{this.relationtype}}('\App\\{{this.relatedmodel}}');
+    {{/if}}
   }
 
   {{/each}}
