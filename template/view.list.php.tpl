@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table class="table table-bordered table-hover table-striped">
+    <table class="table table-condensed table-hover table-striped">
         <thead>
             <tr>
                 {{#each column}}
