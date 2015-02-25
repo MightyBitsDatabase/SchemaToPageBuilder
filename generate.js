@@ -99,6 +99,19 @@ util.fileIO.openFile = function(fileName) {
         }
     });
 
+    hb.registerHelper('cameLize', function(value) {
+        if (value) {
+            var array_val = value.split('_');
+            var newval = [];
+            _.forEach(array_val, function(val){
+                newval.push(val.charAt(0).toUpperCase() + val.slice(1).toLowerCase());
+            });     
+
+            return newval.join("");
+        } else {
+            return '';
+        }
+    });
 
     hb.registerHelper('ife', function(value, valueb) {
         if (value) {
