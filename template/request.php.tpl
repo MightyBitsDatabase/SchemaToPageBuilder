@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Request;
 
-class CreateUserRequest extends Request {
+class CreateUserRequest extends BaseRequest {
 
     /**
      * Get the validation rules that apply to the request.
@@ -12,7 +12,7 @@ class CreateUserRequest extends Request {
     public function rules()
     {
         return [
-            {{#each model.column}}
+            {{#each column}}
             '{{name}}' => '',
             {{/each}}
         ];
@@ -25,6 +25,6 @@ class CreateUserRequest extends Request {
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 }
