@@ -48,7 +48,7 @@ class {{classname}} extends Model {
   //relation
   //
   
-  {{#each relations}}
+  {{#each model.relations}}
 
   public function {{this.name}}()
   {
