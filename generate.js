@@ -2,12 +2,17 @@ var hb = require('handlebars');
 var fs = require('fs');
 var _  = require('lodash');
 
+var util = {};
+util.fileIO = {};
 
-var db_json = JSON.parse(fs.readFileSync( process.argv[2] , "utf8"));
 
-var fileIO = {};
+util.replaceWithHash = function (str, hash) {
+    var string = str, key; for (key in hash) string = string.replace(new RegExp('\\{' + key + '\\}', 'gm'), hash[key]); 
+    return string;
+}
 
-fileIO.writeFile = function(fileName, stringText) {
+
+util.fileIO.writeFile = function(fileName, stringText) {
     fs.writeFile(fileName, stringText, function(err) {
         if (err) return console.log(err);
         //console.log('write error ' + fileName);
@@ -15,7 +20,20 @@ fileIO.writeFile = function(fileName, stringText) {
 };
 
 
-fileIO.openFile = function(fileName)
+util.getTimeFile = function() {
+
+    var d = new Date();
+    var curr_date = d.getDate();
+    var curr_month = d.getMonth();
+    var curr_year = d.getFullYear();
+    var curr_hour = d.getHours().toString();
+    var curr_min = d.getMinutes().toString();
+    var curr_sec = d.getSeconds().toString();
+
+    return (curr_year + '_' + curr_month + "_" + curr_date + '_' + curr_hour + curr_min + curr_sec);
+};
+
+util.fileIO.openFile = function(fileName)
 {
     return fs.readFileSync(fileName, "utf8");
 };
@@ -95,7 +113,7 @@ fileIO.openFile = function(fileName)
     });
 }());
 
-
+/// template
 
 var generateRelation = function(model)
 {
@@ -143,104 +161,16 @@ var addRelationToColumn = function(model){
 
 };
 
-
-var generateRoute = function(model)
-{
-    var template_var = model;
-    var template = fileIO.openFile("./template/route.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;
-};
-
-
-var generateLayoutTemplate = function(model)
-{
-    var template_var = model;
-    var template = fileIO.openFile("./template/main.layout.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;
-};
-
-
-var generateListView = function(model)
-{
-    var template_var = model;
-    var template = fileIO.openFile("./template/view.list.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;
-};
-
-
-
-var generateDetailView = function(model)
-{
-    var template_var = model;
-    var relation_array = generateRelation(model);
-    template_var.relation_array = relation_array;
-
-    addRelationToColumn(model);
-
-
-    var template = fileIO.openFile("./template/view.detail.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;
-};
-
-
-
-var generateView = function(model)
-{
-    var template_var = model;
-
-    addRelationToColumn(model);
-
-    var template = fileIO.openFile("./template/view.index.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;
-};
-
-
-
-var generateMigration = function(model)
-{
-
-    var template_var = model;
-
-    var template = fileIO.openFile("./template/migration.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-
-    return pageText;
-
-
-};
-
-
-var generateDBseederMain = function (model)
-{
-    var template_var = model;
-
-    var template = fileIO.openFile("./template/seeder.php.tpl");    
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;    
-};
-
-var generateSeeding = function(model)
+var addSeedingToColumn = function(model)
 {
     var seeds_source = model.seeding;
     var columns = model.column;
 
-    var template_var = {};
+    var template_var = model;
 
     var seeds = [];
 
-    var template = fileIO.openFile("./template/seed.php.tpl");
+    var template = util.fileIO.openFile("./template/seed.php.tpl");
 
 
     for (var i = seeds_source.length - 1; i >= 0; i--) {
@@ -252,34 +182,12 @@ var generateSeeding = function(model)
     }
 
     template_var.seeds = seeds;
-    template_var.model = model;
-
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-
-    return pageText;
 };
 
-var generateController = function(model) {
-
-    var template_var = model;
-
-    var relation_array = generateRelation(model);
-
-    template_var.relation_array = relation_array;
-
-    var template = fileIO.openFile("./template/controller.php.tpl");
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-
-    return pageText;
-
-};
-
-var generateModel = function(model) {
+var addModelAttribToColumn = function(model) {
 
     var columns = model.column;
-    var _relations = model.relation;
+    var relations = model.relation;
 
     var _fillable = [];
     var _guarded = [];
@@ -293,69 +201,166 @@ var generateModel = function(model) {
         if (col.hidden === true) _hidden.push(col.name);
     }).value();
 
-    var template_var = {
+    var model_var = {
         fillable: _fillable,
         guarded: _guarded,
         visible: _visible,
         hidden: _hidden,
         namespace: "App",
         softdelete: false,
-        relations: _relations,
-        model: model        
+        relations: relations,
     };
 
-    //console.log(model_test.column);
-    var template = fileIO.openFile("./template/model.php.tpl");
+    model.model = model_var;
+};
 
+var compileTemplateToString = function (template_file, column)
+{
+    var template_var = column;
+    var template = util.fileIO.openFile(template_file);
     var pageBuilder = hb.compile(template);
     var pageText = pageBuilder(template_var);
-
     return pageText;
 };
 
 
-var getTimeFile = function() {
+var injectTemplateVariable = function(database)
+{
+    _.forEach(database, function(model){
+        model.relation_array =  generateRelation(model);   
+        addRelationToColumn(model); 
+        addSeedingToColumn(model);
+        addModelAttribToColumn(model);
+    });    
+}
 
-    var d = new Date();
-    var curr_date = d.getDate();
-    var curr_month = d.getMonth();
-    var curr_year = d.getFullYear();
-    var curr_hour = d.getHours().toString();
-    var curr_min = d.getMinutes().toString();
-    var curr_sec = d.getSeconds().toString();
+var writeTemplate = function(database, templates)
+{
+    _.forEach(database, function(table){    
+        console.log("");
+        console.log("Processing " + table.name + " template");
+        console.log("---------------------------------------");
 
-    return (curr_year + '_' + curr_month + "_" + curr_date + '_' + curr_hour + curr_min + curr_sec);
-};
+        _.forEach(templates.table, function(template){
+            var compiled_template = compileTemplateToString(template.src, table);
+            file_hash = {
+                classname: table.classname.toLowerCase(),
+                uclassname: table.classname,
+                name: table.name.toLowerCase()
+            };
+            var template_filename = util.replaceWithHash(template.filename, file_hash);
+            console.log("Writing " + template.name + " to " + template.dst + template_filename );
+            util.fileIO.writeFile(template.dst  +  template_filename, compiled_template);   
 
-var     curr_time = getTimeFile();
+        });
+        console.log("");
+
+    });
+}
+
+
+
+var curr_time = util.getTimeFile();
 
 if ( process.argv[3] === 'notime') {
     curr_time = "";
 }
 
 
-var views_path = "/Applications/AMPPS/www/laracoba/resources/views/";
-var models_path = "/Applications/AMPPS/www/laracoba/app/";
-var controllers_path = "/Applications/AMPPS/www/laracoba/app/Http/Controllers/";
-var routes_path = '/Applications/AMPPS/www/laracoba/app/Http/';
-//var views_path = "./build/views/";
-//var models_path = "./build/models/";
-//var controllers_path = "./build/controllers/";
+//Template config variable
+
+var template_path    = "./template/";
+var laravel_path     = "/Applications/AMPPS/www/laracoba";
+var view_path        = laravel_path + "/resources/views/";
+var model_path       = laravel_path + "/app/";
+var controller_path  = laravel_path + "/app/Http/Controllers/";
+var route_path       = laravel_path + "/app/Http/";
+var migration_path   = "./build/migrations/";
+var seed_path        = "./build/seeds/";
 
 
-_(db_json).forEach(function(mod){
-   fileIO.writeFile(models_path + mod.classname + '.php', generateModel(mod));
-   fileIO.writeFile(controllers_path + mod.classname  + 'Controller' + '.php', generateController(mod));
-   fileIO.writeFile(views_path  +  mod.classname.toLowerCase() + '_index'  + '.' + 'blade'  + '.php', generateView(mod));   
-   fileIO.writeFile(views_path  +  mod.classname.toLowerCase() + '_list'  + '.' + 'blade'  + '.php', generateListView(mod));   
-   fileIO.writeFile(views_path  +  mod.classname.toLowerCase() + '_show' + '.' + 'blade'  + '.php', generateDetailView(mod));   
-   fileIO.writeFile('./build/migrations/'  + curr_time + '_' + 'create' + '_' + mod.name.toLowerCase() + '_' + 'table'  + '.php', generateMigration(mod));   
-   fileIO.writeFile('./build/seeds/'  +  mod.name.toLowerCase() + '_' + 'seed'  + '.php', generateSeeding(mod));      
-}).value();
+var templates = {
+    table: [
+    {
+        name: "migration",
+        src: template_path + "migration.php.tpl",
+        dst: migration_path,
+        filename: curr_time + '_create_{name}_table.php'
+    },
+    {
+        name: "seeding",
+        src: template_path + "migration.php.tpl",
+        dst: seed_path,
+        filename: '{name}_seed.php'
+    },
+    {
+        name: "model",
+        src: template_path + "model.php.tpl",
+        dst: model_path,
+        filename: "{uclassname}.php"
+    },
+    {
+        name : "controller",
+        src: template_path + "controller.php.tpl",
+        dst: controller_path,
+        filename: "{uclassname}Controller.php"
+    },
+    {
+        name : "detailview",
+        src: template_path + "view.detail.php.tpl",
+        dst: view_path,
+        filename: "{classname}_show.blade.php"
+    },
+    {
+        name : "listview",
+        src: template_path + "view.list.php.tpl",
+        dst: view_path,
+        filename: "{classname}_list.blade.php"
+    },
+    {
+        name : "indexview",
+        src: template_path + "view.index.php.tpl",
+        dst: view_path,
+        filename: "{classname}_index.blade.php"
+    }],
+    main: [
+    {
+        name : "routes",
+        src: template_path + "routes.php.tpl",
+        dst: route_path,
+        filename: "routes.php"
+    },    
+    {
+        name : "seedmain",
+        src: template_path + "seeder.php.tpl",
+        dst: seed_path,
+        filename: "DatabaseSeeder.php"
+    },
+    {
+        name : "main_layout",
+        src: template_path + "main.layout.php.tpl",
+        dst: view_path,
+        filename: "main_layout.blade.php"
+    }]
+};
 
-   fileIO.writeFile('./build/seeds/'  +  'DatabaseSeeder'  + '.php', generateDBseederMain(db_json));   
-   fileIO.writeFile( routes_path  +  'routes'  + '.php', generateRoute(db_json));   
-   fileIO.writeFile(views_path  +  'main_layout' + '.' + 'blade'  + '.php', generateLayoutTemplate(db_json));   
+
+var test_template = {
+    table: [
+    {
+        name: "model",
+        src: template_path + "model.php.tpl",
+        dst: model_path,
+        filename: "{uclassname}.php"
+    }]
+};
+
+var db_json = JSON.parse(fs.readFileSync( process.argv[2] , "utf8"));
+
+injectTemplateVariable(db_json);
+writeTemplate(db_json, templates);
 
 
-//console.log(model);
+  // fileIO.writeFile('./build/seeds/'  +  'DatabaseSeeder'  + '.php', generateDBseederMain(db_json));   
+  // fileIO.writeFile( routes_path  +  'routes'  + '.php', generateRoute(db_json));   
+  // fileIO.writeFile(views_path  +  'main_layout' + '.' + 'blade'  + '.php', generateLayoutTemplate(db_json));   

@@ -12,30 +12,30 @@ use Illuminate\Database\Eloquent\Model;
 use SoftDeletingTrait;
 {{/if}}
 
-class {{model.classname}} extends Model {
+class {{classname}} extends Model {
 
-  {{#if fillable}}
-  protected $fillable = array({{{csv fillable}}});
+  {{#if model.fillable}}
+  protected $fillable = array({{{csv model.fillable}}});
   {{/if}}
-  {{#if guarded}}
-  protected $guarded = array({{{csv guarded}}});
+  {{#if model.guarded}}
+  protected $guarded = array({{{csv model.guarded}}});
   {{/if}}
-  {{#if visible}}
-  protected $visible = array({{{csv visible}}});
+  {{#if model.visible}}
+  protected $visible = array({{{csv model.visible}}});
   {{/if}}
-  {{#if hidden}}
-  protected $hidden = array({{{csv hidden}}});
+  {{#if model.hidden}}
+  protected $hidden = array({{{csv model.hidden}}});
   {{/if}}
 
-  protected $table = '{{toLowerCase model.name}}';
+  protected $table = '{{toLowerCase name}}';
   
-  {{#if model.timestamp}}
+  {{#if timestamp}}
   public $timestamps = true;
   {{else}}
   public $timestamps = false;
   {{/if}}
 
-  {{#each model.column}}
+  {{#each column}}
 
   public function {{this.name}}()
   {

@@ -1,18 +1,18 @@
 <?php
 use Illuminate\Database\Seeder;
-use App\\{{model.classname}};
+use App\\{{classname}};
 
-class {{model.name}}TableSeeder extends Seeder {
+class {{name}}TableSeeder extends Seeder {
     public function run()
     {
-        DB::table('{{toLowerCase model.name}}')->delete();
+        DB::table('{{toLowerCase name}}')->delete();
 
         {{#each seeds}}
-        ${{toLowerCase ../model.name}} = new {{../model.classname}}();        
+        ${{toLowerCase ../name}} = new {{../classname}}();        
         {{#each this}}
-        ${{toLowerCase ../../model.name}}->{{@key}} = "{{this}}";
+        ${{toLowerCase ../../name}}->{{@key}} = "{{this}}";
         {{/each}}
-        ${{toLowerCase ../model.name}}->save();
+        ${{toLowerCase ../name}}->save();
 
         {{/each}}
     }
