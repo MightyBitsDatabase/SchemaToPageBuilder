@@ -1,0 +1,80 @@
+{
+    "project": {
+        "name" : "Lifepatch Accounting System",
+        "skema" : "./skema/Akun6.skema"
+    },
+    "path": {
+        "template_path": "./template/",
+        "laravel_path": "/Applications/AMPPS/www/laracoba",
+        "view_path": "/resources/views/",
+        "model_path": "/app/",
+        "controller_path": "/app/Http/Controllers/",
+        "route_path": "/app/Http/",
+        "migration_path": "./build/migrations/",
+        "seed_path": "./build/seeds/"
+    },
+    "table": [
+        {
+            "name": "migration",
+            "src": "{template_path}migration.php.tpl",
+            "dst": "{migration_path}",
+            "filename": "{filetime}_create_{name}_table.php"
+        },
+        {
+            "name": "seeding",
+            "src": "{template_path}migration.php.tpl",
+            "dst": "{seed_path}",
+            "filename": "{name}_seed.php"
+        },
+        {
+            "name": "model",
+            "src": "{template_path}model.php.tpl",
+            "dst": "{laravel_path}{model_path}",
+            "filename": "{uclassname}.php"
+        },
+        {
+            "name": "controller",
+            "src": "{template_path}controller.php.tpl",
+            "dst": "{laravel_path}{controller_path}",
+            "filename": "{uclassname}Controller.php"
+        },
+        {
+            "name": "detailview",
+            "src": "{template_path}view.detail.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_show.blade.php"
+        },
+        {
+            "name": "listview",
+            "src": "{template_path}view.list.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_list.blade.php"
+        },
+        {
+            "name": "indexview",
+            "src": "{template_path}view.index.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_index.blade.php"
+        }
+    ],
+    "main": [
+        {
+            "name": "routes",
+            "src": "{template_path}routes.php.tpl",
+            "dst": "{laravel_path}{route_path}",
+            "filename": "routes.php"
+        },
+        {
+            "name": "seedmain",
+            "src": "{template_path}seeder.php.tpl",
+            "dst": "{seed_path}",
+            "filename": "DatabaseSeeder.php"
+        },
+        {
+            "name": "main_layout",
+            "src": "{template_path}main.layout.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "main_layout.blade.php"
+        }
+    ]
+}

@@ -1,24 +1,23 @@
 var hb = require('handlebars');
 var fs = require('fs');
-var _  = require('lodash');
+var _ = require('lodash');
 
 var util = {};
 util.fileIO = {};
 
 
-util.replaceWithHash = function (str, hash) {
-    var string = str, key; for (key in hash) string = string.replace(new RegExp('\\{' + key + '\\}', 'gm'), hash[key]); 
+
+util.replaceWithHash = function(str, hash) {
+    var string = str,
+        key;
+    for (key in hash) string = string.replace(new RegExp('\\{' + key + '\\}', 'gm'), hash[key]);
     return string;
 }
 
 
-util.fileIO.writeFile = function(fileName, stringText) {
-    fs.writeFile(fileName, stringText, function(err) {
-        if (err) return console.log(err);
-        //console.log('write error ' + fileName);
-    });
-};
-
+util.readJsonFromFile = function(filename) {
+    return JSON.parse(fs.readFileSync(filename, "utf8"));
+}
 
 util.getTimeFile = function() {
 
@@ -33,8 +32,17 @@ util.getTimeFile = function() {
     return (curr_year + '_' + curr_month + "_" + curr_date + '_' + curr_hour + curr_min + curr_sec);
 };
 
-util.fileIO.openFile = function(fileName)
-{
+
+util.fileIO.writeFile = function(fileName, stringText) {
+    fs.writeFile(fileName, stringText, function(err) {
+        if (err) return console.log(err);
+        //console.log('write error ' + fileName);
+    });
+};
+
+
+
+util.fileIO.openFile = function(fileName) {
     return fs.readFileSync(fileName, "utf8");
 };
 
@@ -115,44 +123,70 @@ util.fileIO.openFile = function(fileName)
 
 /// template
 
-var generateRelation = function(model)
-{
+var readConfigFromFile = function(filename) {
+    var config = util.readJsonFromFile(filename);
+    var path_hash = config.path;
+    var template_table = config.table;
+    var template_main = config.main;
+
+
+    path_hash.filetime = curr_time; //util.getTimeFile();
+
+    _.forEach(template_table, function(template) {
+        template.src = util.replaceWithHash(template.src, path_hash);
+        template.dst = util.replaceWithHash(template.dst, path_hash);
+        template.filename = util.replaceWithHash(template.filename, path_hash);
+    });
+
+    _.forEach(template_main, function(template) {
+        template.src = util.replaceWithHash(template.src, path_hash);
+        template.dst = util.replaceWithHash(template.dst, path_hash);
+        template.filename = util.replaceWithHash(template.filename, path_hash);
+    });
+
+    return config;
+}
+
+
+var generateRelation = function(model) {
     var relation_array = {};
 
 
-    _(model.relation).forEach(function(relation) {        
-        var table = _.findWhere(db_json, {classname: relation.relatedmodel});
+    _(model.relation).forEach(function(relation) {
+        var table = _.findWhere(db_json, {
+            classname: relation.relatedmodel
+        });
         var column = [];
 
-    
+
         _(table.column).forEach(function(col) {
             column.push(col.name);
         }).value();
 
 
-        if ( typeof relation_array[relation.relationtype] === 'undefined') relation_array[relation.relationtype] = [];
-        relation_array[relation.relationtype].push(
-          { 
-            'relatedcolumn' : relation.relatedcolumn,                        
-            'relatedmodel' : relation.relatedmodel,            
-            'table_name' : table.name.toLowerCase(),
-            'table_class' : table.classname.toLowerCase(),            
-            'relation_name' : relation.name,
-            'foreignkeys' : relation.relatedmodel.toLowerCase(),
+        if (typeof relation_array[relation.relationtype] === 'undefined') relation_array[relation.relationtype] = [];
+        relation_array[relation.relationtype].push({
+            'relatedcolumn': relation.relatedcolumn,
+            'relatedmodel': relation.relatedmodel,
+            'table_name': table.name.toLowerCase(),
+            'table_class': table.classname.toLowerCase(),
+            'relation_name': relation.name,
+            'foreignkeys': relation.relatedmodel.toLowerCase(),
             'column': column
-          }
-        );
+        });
     }).value();
     return relation_array;
 };
 
-var addRelationToColumn = function(model){
+var addRelationToColumn = function(model) {
 
     //auto detect relation based on column name
-    _.forEach(model.column, function(item){
+    _.forEach(model.column, function(item) {
         if (item.name.substr(-3, 3) == '_id') {
-            var rel_to_find = item.name.substr(0,item.name.length-3);
-            var rel = _.findWhere(model.relation, {name: rel_to_find});
+            var rel_to_find = item.name.substr(0, item.name.length - 3);
+            var rel = _.findWhere(model.relation, {
+                name: rel_to_find
+            });
             if (rel.relationtype === "belongsTo") {
                 item.relation = rel;
             };
@@ -161,8 +195,7 @@ var addRelationToColumn = function(model){
 
 };
 
-var addSeedingToColumn = function(model)
-{
+var addSeedingToColumn = function(model) {
     var seeds_source = model.seeding;
     var columns = model.column;
 
@@ -178,7 +211,7 @@ var addSeedingToColumn = function(model)
         for (var j = seeds_source[i].length - 1; j >= 0; j--) {
             row[columns[j].name] = seeds_source[i][j].content;
         }
-            seeds.push(row);
+        seeds.push(row);
     }
 
     template_var.seeds = seeds;
@@ -214,8 +247,7 @@ var addModelAttribToColumn = function(model) {
     model.model = model_var;
 };
 
-var compileTemplateToString = function (template_file, column)
-{
+var compileTemplateToString = function(template_file, column) {
     var template_var = column;
     var template = util.fileIO.openFile(template_file);
     var pageBuilder = hb.compile(template);
@@ -224,24 +256,24 @@ var compileTemplateToString = function (template_file, column)
 };
 
 
-var injectTemplateVariable = function(database)
-{
-    _.forEach(database, function(model){
-        model.relation_array =  generateRelation(model);   
-        addRelationToColumn(model); 
+var injectTemplateVariable = function(database) {
+    _.forEach(database, function(model) {
+        model.relation_array = generateRelation(model);
+        addRelationToColumn(model);
         addSeedingToColumn(model);
         addModelAttribToColumn(model);
-    });    
+    });
 }
 
-var writeTemplate = function(database, templates)
-{
-    _.forEach(database, function(table){    
+var writeTemplate = function(database, templates) {
+
+
+    _.forEach(database, function(table) {
         console.log("");
-        console.log("Processing " + table.name + " template");
+        console.log("Processing " + table.name + " table template");
         console.log("---------------------------------------");
 
-        _.forEach(templates.table, function(template){
+        _.forEach(templates.table, function(template) {
             var compiled_template = compileTemplateToString(template.src, table);
             file_hash = {
                 classname: table.classname.toLowerCase(),
@@ -249,118 +281,46 @@ var writeTemplate = function(database, templates)
                 name: table.name.toLowerCase()
             };
             var template_filename = util.replaceWithHash(template.filename, file_hash);
-            console.log("Writing " + template.name + " to " + template.dst + template_filename );
-            util.fileIO.writeFile(template.dst  +  template_filename, compiled_template);   
+            console.log("Writing " + template.name + " to " + template.dst + template_filename);
+            util.fileIO.writeFile(template.dst + template_filename, compiled_template);
 
         });
-        console.log("");
-
     });
-}
 
+    console.log("");
+    console.log("");
+
+    console.log("Processing main template");
+    console.log("---------------------------------------");
+
+    _.forEach(templates.main, function(template) {
+        var compiled_template = compileTemplateToString(template.src, database);
+        console.log("Writing " + template.name + " to " + template.dst + template.filename);
+        util.fileIO.writeFile(template.dst + template.filename, compiled_template);
+    });
+
+    console.log("");
+
+}
 
 
 var curr_time = util.getTimeFile();
-
-if ( process.argv[3] === 'notime') {
+if (process.argv[3] === 'notime') {
     curr_time = "";
 }
 
+var template_config = readConfigFromFile(process.argv[2]);
+var db_json = util.readJsonFromFile(template_config.project.skema);
 
-//Template config variable
-
-var template_path    = "./template/";
-var laravel_path     = "/Applications/AMPPS/www/laracoba";
-var view_path        = laravel_path + "/resources/views/";
-var model_path       = laravel_path + "/app/";
-var controller_path  = laravel_path + "/app/Http/Controllers/";
-var route_path       = laravel_path + "/app/Http/";
-var migration_path   = "./build/migrations/";
-var seed_path        = "./build/seeds/";
-
-
-var templates = {
-    table: [
-    {
-        name: "migration",
-        src: template_path + "migration.php.tpl",
-        dst: migration_path,
-        filename: curr_time + '_create_{name}_table.php'
-    },
-    {
-        name: "seeding",
-        src: template_path + "migration.php.tpl",
-        dst: seed_path,
-        filename: '{name}_seed.php'
-    },
-    {
-        name: "model",
-        src: template_path + "model.php.tpl",
-        dst: model_path,
-        filename: "{uclassname}.php"
-    },
-    {
-        name : "controller",
-        src: template_path + "controller.php.tpl",
-        dst: controller_path,
-        filename: "{uclassname}Controller.php"
-    },
-    {
-        name : "detailview",
-        src: template_path + "view.detail.php.tpl",
-        dst: view_path,
-        filename: "{classname}_show.blade.php"
-    },
-    {
-        name : "listview",
-        src: template_path + "view.list.php.tpl",
-        dst: view_path,
-        filename: "{classname}_list.blade.php"
-    },
-    {
-        name : "indexview",
-        src: template_path + "view.index.php.tpl",
-        dst: view_path,
-        filename: "{classname}_index.blade.php"
-    }],
-    main: [
-    {
-        name : "routes",
-        src: template_path + "routes.php.tpl",
-        dst: route_path,
-        filename: "routes.php"
-    },    
-    {
-        name : "seedmain",
-        src: template_path + "seeder.php.tpl",
-        dst: seed_path,
-        filename: "DatabaseSeeder.php"
-    },
-    {
-        name : "main_layout",
-        src: template_path + "main.layout.php.tpl",
-        dst: view_path,
-        filename: "main_layout.blade.php"
-    }]
-};
-
-
-var test_template = {
-    table: [
-    {
-        name: "model",
-        src: template_path + "model.php.tpl",
-        dst: model_path,
-        filename: "{uclassname}.php"
-    }]
-};
-
-var db_json = JSON.parse(fs.readFileSync( process.argv[2] , "utf8"));
+console.log("\n\n------------------------------");
+console.log(template_config.project.name);
+console.log("------------------------------");
 
 injectTemplateVariable(db_json);
-writeTemplate(db_json, templates);
+writeTemplate(db_json, template_config);
 
+console.log("done....\n");
 
-  // fileIO.writeFile('./build/seeds/'  +  'DatabaseSeeder'  + '.php', generateDBseederMain(db_json));   
-  // fileIO.writeFile( routes_path  +  'routes'  + '.php', generateRoute(db_json));   
-  // fileIO.writeFile(views_path  +  'main_layout' + '.' + 'blade'  + '.php', generateLayoutTemplate(db_json));   
+// fileIO.writeFile('./build/seeds/'  +  'DatabaseSeeder'  + '.php', generateDBseederMain(db_json));   
+// fileIO.writeFile( routes_path  +  'routes'  + '.php', generateRoute(db_json));   
+// fileIO.writeFile(views_path  +  'main_layout' + '.' + 'blade'  + '.php', generateLayoutTemplate(db_json));
