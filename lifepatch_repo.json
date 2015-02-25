@@ -1,0 +1,27 @@
+{
+    "project": {
+        "name" : "Lifepatch Accounting System",
+        "skema" : "./skema/Akun6.skema"
+    },
+    "path": {
+        "template_path": "./template/",
+        "laravel_path": "/Applications/AMPPS/www/laracoba",
+        "view_path": "/resources/views/",
+        "model_path": "/app/",
+        "controller_path": "/app/Http/Controllers/",
+        "route_path": "/app/Http/",
+        "migration_path": "./build/migrations/",
+        "seed_path": "./build/seeds/"
+    },
+    "table": [
+        {
+            "name": "repository",
+            "src": "{template_path}repository.php.tpl",
+            "dst": "{laravel_path}/app/Repositories/",
+            "filename": "{uclassname}Repository.php"
+        }
+
+    ],
+    "main": [
+    ]
+}

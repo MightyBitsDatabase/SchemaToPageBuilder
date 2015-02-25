@@ -21,8 +21,14 @@
             "filename": "{filetime}_create_{name}_table.php"
         },
         {
+            "name": "request",
+            "src": "{template_path}request.php.tpl",
+            "dst": "{laravel_path}/app/Http/Requests/",
+            "filename": "{uclassname}Requests.php"
+        },        
+        {
             "name": "seeding",
-            "src": "{template_path}migration.php.tpl",
+            "src": "{template_path}seed.php.tpl",
             "dst": "{seed_path}",
             "filename": "{name}_seed.php"
         },
@@ -55,7 +61,20 @@
             "src": "{template_path}view.index.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "{classname}_index.blade.php"
+        },
+        {
+            "name": "formview",
+            "src": "{template_path}view.form.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_form.blade.php"
+        },
+        {
+            "name": "repository",
+            "src": "{template_path}repository.php.tpl",
+            "dst": "{laravel_path}/app/Repositories/",
+            "filename": "{uclassname}Repository.php"
         }
+
     ],
     "main": [
         {
