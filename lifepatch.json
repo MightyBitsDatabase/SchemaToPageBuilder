@@ -45,10 +45,10 @@
             "filename": "{uclassname}Controller.php"
         },
         {
-            "name": "detailview",
-            "src": "{template_path}view.detail.php.tpl",
-            "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}_show.blade.php"
+            "name": "repository",
+            "src": "{template_path}repository.php.tpl",
+            "dst": "{laravel_path}/app/Repositories/",
+            "filename": "{uclassname}Repository.php"
         },
         {
             "name": "listview",
@@ -63,18 +63,29 @@
             "filename": "{classname}_index.blade.php"
         },
         {
-            "name": "formview",
-            "src": "{template_path}view.form.php.tpl",
+            "name": "formpartial",
+            "src": "{template_path}view.form.partial.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}_form.blade.php"
+            "filename": "{classname}_form_partial.blade.php"
+        },        
+        {
+            "name": "showview",
+            "src": "{template_path}view.show.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_show.blade.php"
+        },           
+        {
+            "name": "createview",
+            "src": "{template_path}view.create.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_create.blade.php"
         },
         {
-            "name": "repository",
-            "src": "{template_path}repository.php.tpl",
-            "dst": "{laravel_path}/app/Repositories/",
-            "filename": "{uclassname}Repository.php"
-        }
-
+            "name": "editview",
+            "src": "{template_path}view.edit.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_edit.blade.php"
+        }           
     ],
     "main": [
         {
