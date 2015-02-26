@@ -14,10 +14,14 @@
 
 {{#each this}}
 Route::get('{{toLowerCase name}}', '{{classname}}Controller@index');
+Route::get('{{toLowerCase name}}/create', '{{classname}}Controller@create');
 Route::post('{{toLowerCase name}}', '{{classname}}Controller@store');
 Route::get('{{toLowerCase name}}/{id}', '{{classname}}Controller@show');
-Route::get('{{toLowerCase name}}/edit/{id}', '{{classname}}Controller@edit');
-Route::post('{{toLowerCase name}}/edit/{id}', '{{classname}}Controller@update');
+Route::get('{{toLowerCase name}}/{id}/edit', '{{classname}}Controller@edit');
+Route::put('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
+Route::patch('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
+Route::delete('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
+Route::get('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
 
 {{/each}}
 

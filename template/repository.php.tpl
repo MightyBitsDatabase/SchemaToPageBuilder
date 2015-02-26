@@ -25,18 +25,33 @@ class {{classname}}Repository
 	protected ${{toLowerCase relatedmodel}};
 	{{/each}}
 
+	//	Filter
+
+	{{#each column}}
+	protected $filter{{cameLize name}};
+	{{/each}}
+
+
+
+
 	public function __construct({{classname}} ${{toLowerCase classname}}{{#each relation}},{{relatedmodel}} ${{toLowerCase relatedmodel}}{{/each}})
 	{
 		$this->model = ${{toLowerCase classname}};
 		{{#each relation}}
 		$this->{{toLowerCase relatedmodel}} = ${{toLowerCase relatedmodel}};
-		{{/each}}		
+		{{/each}}
+
+		//set filter to null
+		{{#each column}}
+		$this->filter{{cameLize name}} = null;
+		{{/each}}
+
 	}
 
-	public function listAll()
-	{
-		$this->model->lists('id', 'id');
-	}
+
+	//
+	//	get all with related joint
+	//
 
 	public function getAll()
 	{
@@ -66,23 +81,29 @@ class {{classname}}Repository
         ${{toLowerCase name}} = $this->model->orderBy('id', 'DESC')->paginate($perPage);
         return ${{toLowerCase name}};
     }
+
+   	//
+	//	find by owned attribute
+	//
 		
 	{{#each column}}
 
 	public function findBy{{cameLize name}}(${{name}})
-	{
+	{	
+		{{#ifcond name '===' 'id'}}
 		return $this->model->where('{{name}}', '=', ${{name}})->first();
+		{{else}}
+		return $this->model->where('{{name}}', '=', ${{name}})->get();
+		{{/ifcond}}
 	}
 
 	{{/each}}
 
+	//
+	//	find by related model attribute
+	//
+
 	{{#each relation_array.belongsTo}}
-
-	public function list{{cameLize table_class}}()
-	{
-		return $this->{{toLowerCase relatedmodel}}->lists('{{relatedcolumn}}', 'id'); 
-	}
-
 
 	public function findBy{{cameLize table_class}}{{cameLize relatedcolumn}}(${{relatedcolumn}}, $perPage = 9)
 	{
@@ -102,12 +123,99 @@ class {{classname}}Repository
 	{{/each}}
 	{{#each relation_array.hasMany}}
 	
+	//
+	//	get has many relation
+	//
+
 	public function find{{cameLize table_name}}()
 	{
 
 	}
 	
 	{{/each}}
+
+	//
+	//	list for selectbox
+	//
+
+	public function listAll()
+	{
+		$this->model->lists('id', 'id');
+	}
+	
+	{{#each relation_array.belongsTo}}
+
+	public function list{{cameLize table_class}}()
+	{
+		return $this->{{toLowerCase relatedmodel}}->lists('{{relatedcolumn}}', 'id'); 
+	}
+
+	{{/each}}
+
+
+	//
+	//	Filter function
+	//
+
+	{{#each column}}
+
+    public function where{{cameLize name}}(${{cameLize name}})
+    {
+        $this->filter{{cameLize name}} = ${{cameLize name}};
+        return $this;
+    }
+
+	{{/each}}
+
+	//
+	//	Query Builder
+	//
+
+    public function getFiltered()
+    {
+        return $this->getQueryBuilder()->get();
+    }
+    
+    public function getFilteredPaginated($perpage = 20)
+    {
+        return $this->getQueryBuilder()->paginate($perpage);
+    }    
+
+	protected function getQueryBuilder()
+    {
+
+
+        $modelClass = $this->model;
+        $builder = $modelClass->newQuery();
+    	
+    	{{#if relation_array.belongsTo}}
+		
+	    $select = ['{{toLowerCase name}}.*',{{#each relation_array.belongsTo}}
+	    {{~#each this.column~}}
+	    '{{../table_name}}.{{this}} as {{../table_class}}_{{this}}',
+	    {{~/each}}
+	    {{~/each}}];
+
+		$builder{{~#each relation_array.belongsTo~}}
+		->leftjoin('{{table_name}}', '{{table_name}}.id', '=', '{{toLowerCase ../../name}}.{{toLowerCase relatedmodel}}_id')
+		{{~/each~}}
+		->select($select);
+		{{/if}}
+
+
+    	{{#each column}}
+        if ($this->filter{{cameLize name}}) {
+            $builder->where('{{name}}', $this->filter{{cameLize name}});
+        }
+    	{{/each}}
+
+    	{{#each column}}
+        $this->filter{{cameLize name}} = null;    	
+    	{{/each}}
+
+        return $builder;
+    }
+
 
 
 }

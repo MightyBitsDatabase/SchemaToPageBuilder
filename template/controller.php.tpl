@@ -17,7 +17,32 @@ use Illuminate\Http\Request;
   {{/if}}
 {{/each}}
 
+use App\Repositories\\{{classname}}Repository;
+
+{{#each relation_array.hasMany~}}
+    use App\Repositories\\{{relatedmodel}}Repository;
+{{/each}}
+
+
 class {{classname}}Controller extends Controller {
+
+protected ${{classname}}Repo;
+{{#each relation_array.hasMany}}
+protected ${{relatedmodel}}Repo;
+{{/each}}
+
+
+  public function __construct({{classname}}Repository ${{classname}}{{#each relation_array.hasMany~}},{{relatedmodel}}Repository ${{relatedmodel}}{{/each}})
+  {
+
+    $this->{{classname}}Repo = ${{classname}};
+    {{#each relation_array.hasMany}}
+    $this->{{relatedmodel}}Repo = ${{relatedmodel}};
+    {{/each}}
+
+
+  }
+
 
   /**
    * Display a listing of the resource.
@@ -30,35 +55,14 @@ class {{classname}}Controller extends Controller {
   public function index()
   {
 
-
-
-    $select = ['{{toLowerCase name}}.*',{{#each relation_array.belongsTo}}
-    {{~#each this.column~}}
-    '{{../table_name}}.{{this}} as {{../table_class}}_{{this}}',
-    {{~/each}}
-    {{~/each}}];
+    ${{classname}} = $this->{{classname}}Repo;
 
     return View('{{toLowerCase classname}}_index', [
 
         {{#each relation_array.belongsTo}}
         '{{toLowerCase relatedmodel}}_list' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
         {{/each}}
-
-      {{#if relation_array.belongsTo}}
-        '{{toLowerCase classname}}' => {{classname~}}
-          {{~#each relation_array.belongsTo}}
-            
-
-            {{#unless @index~}}::{{else}}->{{/unless}}leftjoin('{{table_name}}', '{{table_name}}.id', '=', '{{toLowerCase ../../name}}.{{toLowerCase relatedmodel}}_id')
-          {{~/each}}
-            
-
-            ->select($select)
-
-            ->get(),
-      {{else}}
-        '{{toLowerCase classname}}' => {{classname}}::all(),
-      {{/if}}
+        '{{toLowerCase classname}}' => ${{classname}}->getFiltered()
     ]);
   }
 
@@ -69,7 +73,14 @@ class {{classname}}Controller extends Controller {
    */
   public function create(Request $request)
   {
-      {{classname}}::create($request->all());
+      return View('{{toLowerCase classname}}_create', [
+
+      {{#each relation_array.belongsTo}}
+      '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
+      {{/each}}
+      
+      ]);
+
   }
 
   /**
@@ -96,6 +107,12 @@ class {{classname}}Controller extends Controller {
   {
     //  todo relationship
     //
+    
+    {{#each relation_array.hasMany}}
+    ${{relatedmodel}} = $this->{{relatedmodel}}Repo;
+    ${{relatedmodel}}->where{{ucFirst ../classname}}Id($id);
+
+    {{/each}}
 
     return View('{{toLowerCase classname}}_show', [
 
@@ -104,7 +121,7 @@ class {{classname}}Controller extends Controller {
       '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
     {{/each}}
     {{#each relation_array.hasMany}}
-      '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::where("{{toLowerCase ../classname}}_id", $id)->get(),
+      '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
     {{/each}}    
     
     ]);
@@ -123,7 +140,7 @@ class {{classname}}Controller extends Controller {
    */
   public function edit($id)
   {
-    return View('{{toLowerCase classname}}_show', [
+    return View('{{toLowerCase classname}}_edit', [
 
       '{{toLowerCase classname}}' => {{classname}}::findOrFail($id),
     {{#each relation_array.belongsTo}}
@@ -159,7 +176,7 @@ class {{classname}}Controller extends Controller {
   public function destroy($id)
   {
     ({{classname}}::destroy($id));
-    return Redirect::route('{{toLowerCase classname}}.index');
+    return Redirect::back();
   }
   
 }
