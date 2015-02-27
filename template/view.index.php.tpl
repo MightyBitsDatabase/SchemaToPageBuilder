@@ -8,7 +8,7 @@
   </div>
   <div class="col-lg-12">
     <div class="table-responsive">
-      <table class="table  table-condensed table-hover table-striped">
+      <table class="table table-bordered table-condensed table-hover table-striped">
         <thead>
           <tr>
                {{#each column}}
@@ -20,23 +20,6 @@
           </tr>
         </thead>
         <tbody>
-            <tr>
-              {!! Form::open(array('action' => ['{{classname}}Controller@store'], 'method' => 'POST')) !!}
-
-               {{#each column}}
-               {{#ifcond name '!==' 'id'}}
-               {{#if relation}}
-                <td>{!! Form::select('{{name}}', ${{relation.name}}_list, null,  array('class' => 'form-control', 'style' => ''))  !!}</td>
-               {{else}}
-                <td><input type="text" name="{{name}}" class="date form-control input-sm" data-parsley-required="true" value=""> </td>
-               {{/if}}
-               {{/ifcond}}
-               {{/each}}
-                <td>
-                {!! Form::submit('Add {{ucFirst classname}}', ['class' => 'btn btn-primary']) !!}
-                </td>
-            {!! Form::close() !!}
-        </tr>
           @foreach (${{toLowerCase classname}} as $row)
           <tr>
                {{#each column}}
