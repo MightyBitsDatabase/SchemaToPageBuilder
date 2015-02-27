@@ -58,10 +58,6 @@ protected ${{relatedmodel}}Repo;
     ${{classname}} = $this->{{classname}}Repo;
 
     return View('{{toLowerCase classname}}_index', [
-
-        {{#each relation_array.belongsTo}}
-        '{{toLowerCase relatedmodel}}_list' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
-        {{/each}}
         '{{toLowerCase classname}}' => ${{classname}}->getFiltered()
     ]);
   }
@@ -73,15 +69,11 @@ protected ${{relatedmodel}}Repo;
    */
   public function create(Request $request)
   {
-      return View('{{toLowerCase classname}}_create', [
 
-      {{#each relation_array.belongsTo}}
-      '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
-      {{/each}}
-      
-      ]);
+      return View('{{toLowerCase classname}}_create');
 
   }
+
 
   /**
    * Store a newly created resource in storage.
@@ -90,9 +82,12 @@ protected ${{relatedmodel}}Repo;
    */
   public function store(Request $request)
   {
+
     {{classname}}::create($request->all());
     return Redirect::back();
+
   }
+
 
   /**
    * Display the specified resource.
@@ -105,8 +100,6 @@ protected ${{relatedmodel}}Repo;
    */
   public function show($id)
   {
-    //  todo relationship
-    //
     
     {{#each relation_array.hasMany}}
     ${{relatedmodel}} = $this->{{relatedmodel}}Repo;
@@ -117,17 +110,14 @@ protected ${{relatedmodel}}Repo;
     return View('{{toLowerCase classname}}_show', [
 
       '{{toLowerCase classname}}' => {{classname}}::findOrFail($id),
-    {{#each relation_array.belongsTo}}
-      '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
-    {{/each}}
     {{#each relation_array.hasMany}}
       '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
     {{/each}}    
     
     ]);
 
-
   }
+
 
   /**
    * Show the form for editing the specified resource.
@@ -140,11 +130,11 @@ protected ${{relatedmodel}}Repo;
    */
   public function edit($id)
   {
-    return View('{{toLowerCase classname}}_edit', [
 
-      '{{toLowerCase classname}}' => {{classname}}::findOrFail($id),
-    {{#each relation_array.belongsTo}}
-      '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::lists("{{toLowerCase relatedcolumn}}", "id"),
+    {{#each relation_array.hasMany}}
+    ${{relatedmodel}} = $this->{{relatedmodel}}Repo;
+    ${{relatedmodel}}->where{{ucFirst ../classname}}Id($id);
+
     {{/each}}
     {{#each relation_array.hasMany}}
       '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::where("{{toLowerCase ../classname}}_id", $id)->get(),
