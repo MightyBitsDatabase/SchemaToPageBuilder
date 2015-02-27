@@ -2,7 +2,7 @@
 {{#if relation}}
 <div class="form-group">
   <label for="{{relatedmodel}}_{{relatedcolumn}}">{{relation.relatedmodel}} {{ucFirst relation.relatedcolumn}}</label>
-  {!! Form::select('{{toLowerCase relation.relatedmodel}}_id', ${{toLowerCase relation.relatedmodel}}, isset(${{toLowerCase ../../classname}}) ? ${{toLowerCase ../../classname}}->{{toLowerCase relation.relatedmodel}}_id  : '1', ['class' => 'form-control']) !!}
+  {!! Form::select('{{toLowerCase relation.relatedmodel}}_id', ListHelper::list{{ucFirst relation.relatedmodel}}(), isset(${{toLowerCase ../../classname}}) ? ${{toLowerCase ../../classname}}->{{toLowerCase relation.relatedmodel}}_id  : '1', ['class' => 'form-control']) !!}
 </div>
 {{else}}
 {{#ifcond name '!==' 'id'}}

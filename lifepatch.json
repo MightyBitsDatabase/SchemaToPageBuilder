@@ -111,6 +111,12 @@
             "src": "{template_path}main.layout.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "main_layout.blade.php"
-        }
+        },
+        {
+            "name": "listhelper",
+            "src": "{template_path}helper.list.php.tpl",
+            "dst": "{laravel_path}/app/Helpers/",
+            "filename": "ListHelper.php"
+        }            
     ]
 }
