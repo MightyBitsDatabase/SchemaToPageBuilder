@@ -89,6 +89,12 @@ class {{classname}}Repository
 		return $this->model->find($id);
 	}
 
+
+	public function delete($id)
+	{
+		return $this->model->delete($id);
+	}
+
    	//
 	//	find by owned attribute
 	//
@@ -98,7 +104,7 @@ class {{classname}}Repository
 	public function findBy{{cameLize name}}(${{name}})
 	{	
 		{{#ifcond name '===' 'id'}}
-		return $this->model->where('{{name}}', '=', ${{name}})->first();
+		return $this->model->findOrFail(${{name}});
 		{{else}}
 		return $this->model->where('{{name}}', '=', ${{name}})->get();
 		{{/ifcond}}

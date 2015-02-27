@@ -40,7 +40,6 @@ protected ${{relatedmodel}}Repo;
     $this->{{relatedmodel}}Repo = ${{relatedmodel}};
     {{/each}}
 
-
   }
 
 
@@ -60,7 +59,9 @@ protected ${{relatedmodel}}Repo;
     return View('{{toLowerCase classname}}_index', [
         '{{toLowerCase classname}}' => ${{classname}}->getFiltered()
     ]);
+
   }
+
 
   /**
    * Show the form for creating a new resource.
@@ -136,13 +137,20 @@ protected ${{relatedmodel}}Repo;
     ${{relatedmodel}}->where{{ucFirst ../classname}}Id($id);
 
     {{/each}}
+
+
+    return View('{{toLowerCase classname}}_edit', [
+
+      '{{toLowerCase classname}}' => $this->{{classname}}Repo->findById($id),
+
     {{#each relation_array.hasMany}}
-      '{{toLowerCase relatedmodel}}' => {{relatedmodel}}::where("{{toLowerCase ../classname}}_id", $id)->get(),
+      '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
     {{/each}}     
     
     ]);
 
   }
+
 
   /**
    * Update the specified resource in storage.
@@ -152,10 +160,13 @@ protected ${{relatedmodel}}Repo;
    */
   public function update($id, Request $request)
   {
-    ${{toLowerCase classname}} = {{classname}}::findOrFail($id);
+
+    ${{toLowerCase classname}} = $this->{{classname}}Repo->findById($id);
     ${{toLowerCase classname}}->update($request->all());
     return redirect('{{toLowerCase name}}');
+
   }
+
 
   /**
    * Remove the specified resource from storage.
@@ -165,8 +176,10 @@ protected ${{relatedmodel}}Repo;
    */
   public function destroy($id)
   {
-    ({{classname}}::destroy($id));
+
+    $this->{{classname}}Repo->delete($id);
     return Redirect::back();
+
   }
   
 }
