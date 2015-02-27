@@ -21,6 +21,18 @@
         {!! Form::close() !!}
       </div>
     </div>
+    {{#each relation_array.hasMany}}
+<div class="row">
+  <div class="col-lg-12">
+    <h2 class="">
+    {{relatedmodel}} <small>List View</small>
+    </h2>
+  </div>
+  <div class="col-lg-12">
+    @include('{{toLowerCase relatedmodel}}_list', ['{{toLowerCase relatedmodel}}' => ${{toLowerCase relatedmodel}}])
+  </div>
+</div>
+{{/each}}
   </div>
 </div>
 @stop
