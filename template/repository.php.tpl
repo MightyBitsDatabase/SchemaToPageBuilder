@@ -20,6 +20,8 @@
 class {{classname}}Repository
 {
 
+	// Eloquent Model
+
 	protected $model;
 	{{#each relation}}
 	protected ${{toLowerCase relatedmodel}};
@@ -81,6 +83,11 @@ class {{classname}}Repository
         ${{toLowerCase name}} = $this->model->orderBy('id', 'DESC')->paginate($perPage);
         return ${{toLowerCase name}};
     }
+
+	public function find($id)
+	{
+		return $this->model->find($id);
+	}
 
    	//
 	//	find by owned attribute
