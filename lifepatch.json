@@ -67,6 +67,12 @@
             "src": "{template_path}view.form.partial.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "{classname}_form_partial.blade.php"
+        },
+        {
+            "name": "formrow",
+            "src": "{template_path}view.form.row.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_form_row.blade.php"
         },        
         {
             "name": "showview",
@@ -85,7 +91,7 @@
             "src": "{template_path}view.edit.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "{classname}_edit.blade.php"
-        }           
+        }            
     ],
     "main": [
         {
