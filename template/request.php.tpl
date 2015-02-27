@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Request;
 
-class CreateUserRequest extends BaseRequest {
+class {{classname}}Request extends BaseRequest {
 
     /**
      * Get the validation rules that apply to the request.
