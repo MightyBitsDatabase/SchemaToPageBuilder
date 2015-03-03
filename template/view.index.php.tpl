@@ -3,42 +3,15 @@
 <div class="row">
   <div class="col-lg-12">
     <h1 class="page-header">
-    {{classname}} <small>List View</small>
-    </h1>
-  </div>
-  <div class="col-lg-12">
-    <div class="table-responsive">
-      <table class="table table-bordered table-condensed table-hover table-striped">
-        <thead>
-          <tr>
-               {{#each column}}
-               {{#ifcond name '!==' 'id'}}
-            <th>{{ucFirst name}}</th>
-               {{/ifcond}}
-               {{/each}}
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach (${{toLowerCase classname}} as $row)
-          <tr>
-               {{#each column}}
-               {{#ifcond name '!==' 'id'}}
-            {{#if relation}}
-            <td>\{{ $row->{{toLowerCase relation.name}}_{{relation.relatedcolumn}} }}</td>
-            {{else}}
-            <td>\{{ $row->{{name}} }}</td>
-            {{/if}}
-               {{/ifcond}}
-               {{/each}}
-            <td><a href="\{{ action('{{classname}}Controller@show', $row->id) }}" class="btn btn-xs btn-default">detail</a> <a href="\{{ action('{{classname}}Controller@edit', $row->id) }}" class="btn btn-xs btn-default">edit</a> 
+    {{classname}} <small>List View</small> 
 
-            <a href="\{{ action('{{classname}}Controller@destroy', $row->id) }}" class="btn btn-xs btn-default">delete</a></td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
+<a href="\{{ action('{{classname}}Controller@create') }}" onClick="lsdModal(this); return false;" class="btn btn-primary btn-success pull-right"><span class="pencil"></span> create {{toLowerCase classname}}</a>
+
+    </h1>    
+
+  </div>
+  <div id="Table{{classname}}" class="col-lg-12">
+    @include("{{toLowerCase classname}}_table")
   </div>
 </div>
 @stop

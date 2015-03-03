@@ -22,6 +22,12 @@ Route::put('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
 Route::patch('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
 Route::delete('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
 Route::get('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
+{{#each relation_array.hasMany}}
+Route::get('{{toLowerCase ../name}}/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@create{{relatedmodel}}');
+{{/each}}  
+
+
+
 
 {{/each}}
 

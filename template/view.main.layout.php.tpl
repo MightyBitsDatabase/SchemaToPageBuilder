@@ -232,7 +232,7 @@
 
                             {{#each this}}
                             <li>
-                                <a href="/{{toLowerCase name}}"><i class="fa fa-table fa-fw"></i> {{toLowerCase name}}</a>
+                                <a href="/{{toLowerCase name}}"><i class="fa fa-table fa-fw"></i> {{name}}</a>
                             </li>
                             {{/each}}
                             
@@ -250,6 +250,29 @@
             <!-- /#page-wrapper -->
         </div>
         <!-- /#wrapper -->
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="mainModalTitle" aria-hidden="true">
+          <div class="modal-dialog">
+            <div id="mainModalContent" class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="mainModalTitle">Modal title</h4>
+              </div>
+              <div class="modal-body">
+                Loading....
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+
         <!-- jQuery -->
         <script src="http://ironsummitmedia.github.io/startbootstrap-sb-admin-2/bower_components/jquery/dist/jquery.min.js"></script>
         <!-- Bootstrap Core JavaScript -->
@@ -258,5 +281,34 @@
         <script src="http://ironsummitmedia.github.io/startbootstrap-sb-admin-2/bower_components/metisMenu/dist/metisMenu.min.js"></script>
         <!-- Custom Theme JavaScript -->
         <script src="http://ironsummitmedia.github.io/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"></script>
+
+
+        <!-- test -->
+        <script type="text/javascript">
+
+
+        var lsdModal = function(e){
+            $('#mainModalContent').html('Loading...');
+            $('#mainModalContent').load(e.href, function(){
+
+            })
+            $('#mainModal').modal('show');
+
+
+        }
+
+        var listenPaginator = function(){
+            $(document).on('click','.tablePaginator a', function (e) {
+                e.preventDefault();
+                var target = ($(e.target).closest('.tablePaginator').attr('content-target'));
+                $('#' + target).load(this.href);
+            })      
+        }
+
+
+        listenPaginator();
+
+        </script>
+        
     </body>
 </html>

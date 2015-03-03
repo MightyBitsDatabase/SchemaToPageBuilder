@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 {{else~}}
     use App\\{{classname}};
 {{/if}}
-
 {{#each relation}}
   {{#if ../../namespace~}}
     use {{namespace}}\\{{relatedmodel}};
@@ -18,10 +17,11 @@ use Illuminate\Http\Request;
 {{/each}}
 
 use App\Repositories\\{{classname}}Repository;
-
 {{#each relation_array.hasMany~}}
     use App\Repositories\\{{relatedmodel}}Repository;
 {{/each}}
+
+use App\Http\Requests\\{{classname}}Request;
 
 
 class {{classname}}Controller extends Controller {
@@ -51,14 +51,33 @@ protected ${{relatedmodel}}Repo;
    *  Route::get('{{toLowerCase classname}}', '{{classname}}Controller@index');
    * 
    */
-  public function index()
+  public function index(Request $request)
   {
+
+    $perpage = $request->perpage;
+
+    if (is_null($perpage))
+    {
+      $perpage = 10;
+    }
 
     ${{classname}} = $this->{{classname}}Repo;
 
-    return View('{{toLowerCase classname}}_index', [
-        '{{toLowerCase classname}}' => ${{classname}}->getFiltered()
-    ]);
+    $paginated = ${{classname}}->getFilteredPaginated($perpage);
+    $paginated->appends(['perpage' =>  $perpage]);
+
+
+    if ($request->ajax()) {
+      return View('{{toLowerCase classname}}_table', [
+          '{{toLowerCase classname}}' => $paginated
+      ]);
+    }else{
+      return View('{{toLowerCase classname}}_index', [
+          '{{toLowerCase classname}}' => $paginated
+      ]);
+    }
+
+
 
   }
 
@@ -71,9 +90,37 @@ protected ${{relatedmodel}}Repo;
   public function create(Request $request)
   {
 
-      return View('{{toLowerCase classname}}_create');
-
+      if ($request->ajax()) {
+        return View('{{toLowerCase classname}}_form_create', ['modal' => true]);
+      }else{
+        return View('{{toLowerCase classname}}_create');        
+      }
   }
+
+
+
+
+{{#each relation_array.hasMany}}
+  /**
+   * Show the form for creating a new {{relatedmodel}} that owned by {{../classname}}
+   *
+   * @return Response
+   */
+
+  public function create{{relatedmodel}}($id, Request $request)
+  {
+
+    $hidden_field = ['{{toLowerCase ../classname}}_id' => true];
+
+    //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
+    if ($request->ajax()) {
+        return View('{{toLowerCase relatedmodel}}_form_create', ['modal' => true, 'hidden' => $hidden_field]);
+    }else{
+        return View('{{toLowerCase relatedmodel}}_create');        
+    }  
+  }
+
+{{/each}}
 
 
   /**

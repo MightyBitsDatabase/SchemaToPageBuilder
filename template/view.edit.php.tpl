@@ -14,11 +14,7 @@
   <div class="panel-body">
     <div class="row">
       <div class="col-lg-12">
-        {!! Form::model( ${{toLowerCase classname}}, ['action' => ['{{classname}}Controller@update', ${{toLowerCase classname}}->id], 'method' => 'patch'] ) !!}
-        
-        @include("{{toLowerCase classname}}_form_partial")
-
-        {!! Form::close() !!}
+        @include("{{toLowerCase classname}}_form_edit")
       </div>
     </div>
     {{#each relation_array.hasMany}}
@@ -26,6 +22,8 @@
   <div class="col-lg-12">
     <h2 class="">
     {{relatedmodel}} <small>List View</small>
+    <a href="\{{ action('{{relatedmodel}}Controller@create') }}" class="btn btn-primary btn-success pull-right"><span class="pencil"></span> create {{toLowerCase relatedmodel}}</a>
+    
     </h2>
   </div>
   <div class="col-lg-12">

@@ -31,7 +31,8 @@
 <div class="row">
   <div class="col-lg-12">
     <h2 class="">
-    {{relatedmodel}} <small>List View</small>
+    {{relatedmodel}} <small>List View</small><a href="\{{ action('{{../classname}}Controller@create{{relatedmodel}}', ${{toLowerCase ../classname}}->id) }}" onClick="lsdModal(this); return false" class="btn btn-primary btn-success pull-right"><span class="pencil"></span> create {{toLowerCase relatedmodel}}</a>
+
     </h2>
   </div>
   <div class="col-lg-12">

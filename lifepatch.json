@@ -24,7 +24,7 @@
             "name": "request",
             "src": "{template_path}request.php.tpl",
             "dst": "{laravel_path}/app/Http/Requests/",
-            "filename": "{uclassname}Requests.php"
+            "filename": "{uclassname}Request.php"
         },        
         {
             "name": "seeding",
@@ -75,6 +75,24 @@
             "filename": "{classname}_form_row.blade.php"
         },        
         {
+            "name": "formedit",
+            "src": "{template_path}view.form.edit.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_form_edit.blade.php"
+        },   
+        {
+            "name": "formcreate",
+            "src": "{template_path}view.form.create.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_form_create.blade.php"
+        },   
+        {
+            "name": "modal",
+            "src": "{template_path}view.modal.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_modal.blade.php"
+        },                          
+        {
             "name": "showview",
             "src": "{template_path}view.show.php.tpl",
             "dst": "{laravel_path}{view_path}",
@@ -88,10 +106,16 @@
         },
         {
             "name": "editview",
+            "src": "{template_path}view.table.php.tpl",
+            "dst": "{laravel_path}{view_path}",
+            "filename": "{classname}_table.blade.php"
+        },
+        {
+            "name": "tableview",
             "src": "{template_path}view.edit.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "{classname}_edit.blade.php"
-        }            
+        }                         
     ],
     "main": [
         {
@@ -108,7 +132,7 @@
         },
         {
             "name": "main_layout",
-            "src": "{template_path}main.layout.php.tpl",
+            "src": "{template_path}view.main.layout.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "main_layout.blade.php"
         },

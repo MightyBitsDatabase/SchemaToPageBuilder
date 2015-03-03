@@ -13,12 +13,8 @@
   </div>
   <div class="panel-body">
     <div class="row">
-      <div class="col-lg-12">
-        {!! Form::open(['action' => ['{{classname}}Controller@store'], 'method' => 'post'] ) !!}
-        
-        @include("{{toLowerCase classname}}_form_partial")
-
-        {!! Form::close() !!}
+      <div class="col-lg-12">        
+        @include("{{toLowerCase classname}}_form_create")
       </div>
     </div>
   </div>
