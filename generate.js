@@ -48,6 +48,7 @@ util.fileIO.openFile = function(fileName) {
 
 
 (function() {
+
     function checkCondition(v1, operator, v2) {
         switch (operator) {
             case '==':
@@ -128,6 +129,12 @@ util.fileIO.openFile = function(fileName) {
         return options.inverse(this);
     });
 
+    hb.registerHelper('contains', function(v1, v2, options) {
+        if (_.contains(v1, v2)) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
 
     hb.registerHelper('ifcond', function(v1, operator, v2, options) {
         return checkCondition(v1, operator, v2) ? options.fn(this) : options.inverse(this);
