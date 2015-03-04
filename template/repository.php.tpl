@@ -92,7 +92,8 @@ class {{classname}}Repository
 
 	public function delete($id)
 	{
-		return $this->model->delete($id);
+		$model =  $this->model->findOrFail($id);
+		$model->delete();
 	}
 
    	//
@@ -215,6 +216,7 @@ class {{classname}}Repository
 		->select($select);
 		{{/if}}
 
+		$builder->orderBy('id', 'desc');
 
     	{{#each column}}
         if ($this->filter{{cameLize name}}) {

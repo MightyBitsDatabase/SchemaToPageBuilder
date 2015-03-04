@@ -1,12 +1,19 @@
-            <tr>
-                {!! Form::open(array('action' => ['{{classname}}Controller@store'], 'method' => 'POST')) !!}
-                {{#each column}}
-                {{#ifcond name '!==' 'id'}}
-                <td><input type="text" name="{{name}}" class="date form-control input-sm" data-parsley-required="true" value=""> </td>
-                {{/ifcond}}
-                {{/each}}
-                <td>
-                    {!! Form::submit('Add {{ucFirst classname}}', ['class' => 'btn btn-primary']) !!}
-                </td>
-                {!! Form::close() !!}
-            </tr>
+
+<tr>
+    {{#each column}}
+    {{#if relation}}
+    <td>
+        {!! Form::select('{{toLowerCase relation.relatedmodel}}_id', ListHelper::list{{ucFirst relation.relatedmodel}}(), null, ['class' => 'form-control']) !!}
+    </td>
+    {{else}}
+    {{#ifcond name '!==' 'id'}}
+    <td>
+        {!! Form::text('{{name}}', null, ['class' => 'form-control']) !!}
+    </td>
+    {{/ifcond}}
+    {{/if}}
+    {{/each}}
+    <td>
+        {!! Form::submit('Add {{ucFirst classname}}', ['class' => 'btn btn-primary']) !!}
+    </td>
+</tr>

@@ -1,5 +1,4 @@
-{!! Form::model( ${{toLowerCase classname}}, ['action' => ['{{classname}}Controller@update', ${{toLowerCase classname}}->id], 'method' => 'patch'] ) !!}
-
+{!! Form::model( ${{toLowerCase classname}}, ['action' => [ isset($action) ? $action : '{{classname}}Controller@update', ${{toLowerCase classname}}->id], 'method' => 'patch'] ) !!}
 
 @if(isset($modal))
 	@include("{{toLowerCase classname}}_modal")

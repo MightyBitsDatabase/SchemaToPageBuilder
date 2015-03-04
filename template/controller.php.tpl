@@ -58,7 +58,7 @@ protected ${{relatedmodel}}Repo;
 
     if (is_null($perpage))
     {
-      $perpage = 10;
+      $perpage = 25;
     }
 
     ${{classname}} = $this->{{classname}}Repo;
@@ -98,31 +98,6 @@ protected ${{relatedmodel}}Repo;
   }
 
 
-
-
-{{#each relation_array.hasMany}}
-  /**
-   * Show the form for creating a new {{relatedmodel}} that owned by {{../classname}}
-   *
-   * @return Response
-   */
-
-  public function create{{relatedmodel}}($id, Request $request)
-  {
-
-    $hidden_field = ['{{toLowerCase ../classname}}_id' => true];
-
-    //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
-    if ($request->ajax()) {
-        return View('{{toLowerCase relatedmodel}}_form_create', ['modal' => true, 'hidden' => $hidden_field]);
-    }else{
-        return View('{{toLowerCase relatedmodel}}_create');        
-    }  
-  }
-
-{{/each}}
-
-
   /**
    * Store a newly created resource in storage.
    *
@@ -131,7 +106,25 @@ protected ${{relatedmodel}}Repo;
   public function store(Request $request)
   {
 
-    {{classname}}::create($request->all());
+
+    $auth_user = \Auth::User();
+    $auth_user_role = $auth_user->role->name;
+    $auth_user_id = $auth_user->id;
+
+
+    if ($auth_user_role == 'Admin')
+    { 
+      $request_new = $request->all();
+    }else{
+      $request_new = $request->all();
+      $request_new['user_id'] = $auth_user_id;
+    }
+
+    {{classname}}::create($request_new);
+
+
+    if ($request->ajax()) return [ 'success'  => true ];
+
     return Redirect::back();
 
   }
@@ -176,27 +169,53 @@ protected ${{relatedmodel}}Repo;
    *  Route::get('{{toLowerCase classname}}/{id}', '{{classname}}Controller@edit');
    * 
    */
-  public function edit($id)
+  public function edit($id, Request $request)
   {
 
     {{#each relation_array.hasMany}}
     ${{relatedmodel}} = $this->{{relatedmodel}}Repo;
     ${{relatedmodel}}->where{{ucFirst ../classname}}Id($id);
-
     {{/each}}
 
 
-    return View('{{toLowerCase classname}}_edit', [
+    $hidden_field = ['{{toLowerCase classname}}_id' => true];
 
-      '{{toLowerCase classname}}' => $this->{{classname}}Repo->findById($id),
+    $shared_hidden = view()->shared('hidden');
 
-    {{#each relation_array.hasMany}}
-      '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
-    {{/each}}     
-    
-    ]);
+    if (is_array($shared_hidden))
+    {
+      $hidden_field = array_merge($hidden_field, $shared_hidden);      
+    }
+
+    $action_url =  $request->url();
+
+    //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
+    if ($request->ajax()) {
+        return View('{{toLowerCase classname}}_form_edit', [
+          'modal' => true,
+          'action_url' => $action_url, 
+          'hidden' => $hidden_field,
+          '{{toLowerCase classname}}' => $this->{{classname}}Repo->findById($id),
+
+          {{#each relation_array.hasMany}}
+            '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
+          {{/each}}     
+        ]);
+    }else{
+        return View('{{toLowerCase classname}}_edit', [
+          'action_url' => $action_url, 
+          'hidden' => $hidden_field,
+          '{{toLowerCase classname}}' => $this->{{classname}}Repo->findById($id),
+
+          {{#each relation_array.hasMany}}
+            '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
+          {{/each}}     
+
+        ]);        
+    }  
 
   }
+
 
 
   /**
@@ -208,8 +227,23 @@ protected ${{relatedmodel}}Repo;
   public function update($id, Request $request)
   {
 
-    ${{toLowerCase classname}} = $this->{{classname}}Repo->findById($id);
-    ${{toLowerCase classname}}->update($request->all());
+      $resource = $this->{{classname}}Repo->findById($id);
+
+      if($this->checkUserCanEdit($resource))
+      {
+        $resource->update($request->all());
+      }else{
+
+        if($request->ajax()) return ['success' => 'false'];
+
+        return redirect('{{toLowerCase name}}');        
+
+      }
+
+
+    if($request->ajax()) return ['success' => 'true'];
+
+
     return redirect('{{toLowerCase name}}');
 
   }
@@ -221,11 +255,115 @@ protected ${{relatedmodel}}Repo;
    * @param  int  $id
    * @return Response
    */
-  public function destroy($id)
+  public function destroy($id, Request $request)
   {
 
-    $this->{{classname}}Repo->delete($id);
+    $resource = $this->{{classname}}Repo->findById($id);
+
+    if ($this->checkUserCanEdit($resource)) {
+        $this->{{classname}}Repo->delete($id);
+    }else{
+
+      if($request->ajax()) return ['success' => 'false'];
+      return Redirect::back();
+
+    }
+    
+    if($request->ajax()) return ['success' => 'true'];
+
     return Redirect::back();
+
+  }
+
+
+{{#each relation_array.hasMany}}
+  /**
+   * Show the form for creating a new {{relatedmodel}} that owned by {{../classname}}
+   *
+   * @return Response
+   */
+
+  public function create{{relatedmodel}}($id, Request $request)
+  {
+
+
+
+    $hidden_field = ['{{toLowerCase ../classname}}_id' => true];
+
+
+    $shared_hidden = view()->shared('hidden');
+
+    if (is_array($shared_hidden))
+    {
+      $hidden_field = array_merge($hidden_field, $shared_hidden);      
+    }
+
+
+    $action_url =  $request->url();
+
+    //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
+    if ($request->ajax()) {
+        return View('{{toLowerCase relatedmodel}}_form_create', ['modal' => true,'action_url' => $action_url, 'hidden' => $hidden_field]);
+    }else{
+        return View('{{toLowerCase relatedmodel}}_create', ['action_url' => $action_url, 'hidden' => $hidden_field]);        
+    }  
+  }
+
+  public function store{{relatedmodel}}(${{toLowerCase ../classname}}_id, Request $request)
+  {
+
+    $resource = {{../classname}}::findOrFail(${{toLowerCase ../classname}}_id);
+
+    $auth_user = \Auth::User();
+    $auth_user_role = $auth_user->role->name;
+    $auth_user_id = $auth_user->id;    
+
+    $request_new = $request->all();
+
+    if ($this->checkUserCanEdit($resource))
+    {
+      
+      {{#contains column "user_id"}}
+      $request_new['user_id'] = $auth_user_id;
+      {{/contains}}
+      $request_new['{{toLowerCase ../classname}}_id'] = $resource->id;
+      
+      ${{toLowerCase ../classname}}_new = new {{relatedmodel}}($request_new);
+      ${{toLowerCase ../classname}}_new->save();
+
+    }else{
+      if ($request->ajax()) return [ 'success'  => false ]; 
+      return Redirect::back();
+    }
+
+    if ($request->ajax()) return [ 'success'  => true ];    
+    return Redirect::back();
+
+
+  }
+
+{{/each}}
+
+  private function checkUserCanEdit($resource)
+  {
+
+    if (is_null($resource->user_id)) return true;
+
+    $auth_user = \Auth::User();
+    $auth_user_role = $auth_user->role->name;
+    $auth_user_id = $auth_user->id;
+
+
+    if ( $auth_user_role == 'Admin')
+    { 
+        return true;
+    }else{
+      if ($resource->user_id == $auth_user_id ) {
+        return true;
+      }else{
+        return false;
+      }
+    }
 
   }
   

@@ -12,25 +12,30 @@
 |
 */
 
-{{#each this}}
-Route::get('{{toLowerCase name}}', '{{classname}}Controller@index');
-Route::get('{{toLowerCase name}}/create', '{{classname}}Controller@create');
-Route::post('{{toLowerCase name}}', '{{classname}}Controller@store');
-Route::get('{{toLowerCase name}}/{id}', '{{classname}}Controller@show');
-Route::get('{{toLowerCase name}}/{id}/edit', '{{classname}}Controller@edit');
-Route::put('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
-Route::patch('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
-Route::delete('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
-Route::get('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
-{{#each relation_array.hasMany}}
-Route::get('{{toLowerCase ../name}}/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@create{{relatedmodel}}');
-{{/each}}  
+Route::group(['middleware' => ['auth','checkadmin']], function()
+{
+
+	{{#each this}}
+	Route::get('{{toLowerCase name}}', '{{classname}}Controller@index');
+	Route::get('{{toLowerCase name}}/create', '{{classname}}Controller@create');
+	Route::post('{{toLowerCase name}}', '{{classname}}Controller@store');
+	Route::get('{{toLowerCase name}}/{id}', '{{classname}}Controller@show');
+	Route::get('{{toLowerCase name}}/{id}/edit', '{{classname}}Controller@edit');
+	Route::put('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
+	Route::patch('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
+	Route::delete('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
+	Route::get('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
+	{{#each relation_array.hasMany}}
+	Route::get('{{toLowerCase ../name}}/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@create{{relatedmodel}}');
+	Route::post('{{toLowerCase ../name}}/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@store{{relatedmodel}}');
+	{{/each}}  
+
+	{{/each}}
+
+	Route::get('/', 'AccountController@index');
 
 
-
-
-{{/each}}
-
+});
 /*
 |
 |	Auth Controllers

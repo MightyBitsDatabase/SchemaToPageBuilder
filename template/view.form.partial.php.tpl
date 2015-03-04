@@ -13,7 +13,11 @@
 {{#ifcond name '!==' 'id'}}
 <div class="form-group">
   <label for="{{name}}">{{ucFirst name}}</label>
+  {{#ifcond type '!==' 'datetime'}}
   {!! Form::text('{{name}}', null, ['class' => 'form-control']) !!}
+  {{else}}
+  {!! Form::text('{{name}}', null, ['class' => 'form-control datepicker']) !!}
+  {{/ifcond}}
 </div>
 {{/ifcond}}
 {{/if}}
