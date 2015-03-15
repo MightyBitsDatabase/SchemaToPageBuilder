@@ -84,10 +84,10 @@ background-image: none !important;
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         @if (Auth::user())
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#about">Timeline</a></li>
-                        <li><a href="#contact">Reports</a></li>
-                        <li><a href="#contact">Import</a></li>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#">Timeline</a></li>
+                        <li><a href="#">Reports</a></li>
+                        <li><a href="#">Import</a></li>
 
                         <li></li>
                         <li class="dropdown">
