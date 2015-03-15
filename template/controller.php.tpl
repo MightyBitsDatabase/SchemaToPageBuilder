@@ -61,24 +61,16 @@ protected ${{relatedmodel}}Repo;
       $perpage = 25;
     }
 
-    ${{classname}} = $this->{{classname}}Repo;
-
-    $paginated = ${{classname}}->getFilteredPaginated($perpage);
-    $paginated->appends(['perpage' =>  $perpage]);
+    ${{toLowerCase classname}} = $this->{{classname}}Repo->getFilteredPaginated($perpage);
+    ${{toLowerCase classname}}->appends(['perpage' =>  $perpage]);
 
 
     if ($request->ajax()) {
-      return View('{{toLowerCase classname}}_table', [
-          '{{toLowerCase classname}}' => $paginated
-      ]);
-    }else{
-      return View('{{toLowerCase classname}}_index', [
-          '{{toLowerCase classname}}' => $paginated
-      ]);
+      return View('{{toLowerCase classname}}_table', compact('{{toLowerCase classname}}'));
     }
 
-
-
+      return View('{{toLowerCase classname}}_index', compact('{{toLowerCase classname}}'));
+  
   }
 
 
@@ -91,10 +83,10 @@ protected ${{relatedmodel}}Repo;
   {
 
       if ($request->ajax()) {
-        return View('{{toLowerCase classname}}_form_create', ['modal' => true]);
-      }else{
-        return View('{{toLowerCase classname}}_create');        
+        return View('{{toLowerCase classname}}_form_create')->withModal(true);
       }
+
+      return View('{{toLowerCase classname}}_create');        
   }
 
 
@@ -107,17 +99,15 @@ protected ${{relatedmodel}}Repo;
   {
 
 
-    $auth_user = \Auth::User();
-    $auth_user_role = $auth_user->role->name;
-    $auth_user_id = $auth_user->id;
+    $current_user = $this->getCurrentUser();
 
 
-    if ($auth_user_role == 'Admin')
+    if ($current_user['role'] == 'Admin')
     { 
       $request_new = $request->all();
     }else{
       $request_new = $request->all();
-      $request_new['user_id'] = $auth_user_id;
+      $request_new['user_id'] = $current_user['id'];
     }
 
     {{classname}}::create($request_new);
@@ -142,20 +132,13 @@ protected ${{relatedmodel}}Repo;
   public function show($id)
   {
     
-    {{#each relation_array.hasMany}}
-    ${{relatedmodel}} = $this->{{relatedmodel}}Repo;
-    ${{relatedmodel}}->where{{ucFirst ../classname}}Id($id);
+    ${{toLowerCase classname}} = {{classname}}::findOrFail($id);
 
+    {{#each relation_array.hasMany}}
+    ${{toLowerCase relatedmodel}} = $this->{{relatedmodel}}Repo->where{{ucFirst ../classname}}Id($id)->getFiltered();
     {{/each}}
 
-    return View('{{toLowerCase classname}}_show', [
-
-      '{{toLowerCase classname}}' => {{classname}}::findOrFail($id),
-    {{#each relation_array.hasMany}}
-      '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
-    {{/each}}    
-    
-    ]);
+    return View('{{toLowerCase classname}}_show', compact('{{toLowerCase classname}}' {{#each relation_array.hasMany}},'{{toLowerCase relatedmodel}}'{{/each}}));
 
   }
 
@@ -172,47 +155,21 @@ protected ${{relatedmodel}}Repo;
   public function edit($id, Request $request)
   {
 
-    {{#each relation_array.hasMany}}
-    ${{relatedmodel}} = $this->{{relatedmodel}}Repo;
-    ${{relatedmodel}}->where{{ucFirst ../classname}}Id($id);
-    {{/each}}
+   $hidden = $this->mergeHiddenField(['{{toLowerCase classname}}_id' => true]);
+   $action_url   =  $request->url();
 
-
-    $hidden_field = ['{{toLowerCase classname}}_id' => true];
-
-    $shared_hidden = view()->shared('hidden');
-
-    if (is_array($shared_hidden))
-    {
-      $hidden_field = array_merge($hidden_field, $shared_hidden);      
-    }
-
-    $action_url =  $request->url();
+   ${{toLowerCase classname}} = $this->{{classname}}Repo->findById($id);
+   {{#each relation_array.hasMany}}
+   ${{toLowerCase relatedmodel}} = $this->{{relatedmodel}}Repo->where{{ucFirst ../classname}}Id($id)->getFiltered();
+   {{/each}}   
 
     //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
     if ($request->ajax()) {
-        return View('{{toLowerCase classname}}_form_edit', [
-          'modal' => true,
-          'action_url' => $action_url, 
-          'hidden' => $hidden_field,
-          '{{toLowerCase classname}}' => $this->{{classname}}Repo->findById($id),
-
-          {{#each relation_array.hasMany}}
-            '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
-          {{/each}}     
-        ]);
-    }else{
-        return View('{{toLowerCase classname}}_edit', [
-          'action_url' => $action_url, 
-          'hidden' => $hidden_field,
-          '{{toLowerCase classname}}' => $this->{{classname}}Repo->findById($id),
-
-          {{#each relation_array.hasMany}}
-            '{{toLowerCase relatedmodel}}' => ${{relatedmodel}}->getFiltered(),
-          {{/each}}     
-
-        ]);        
-    }  
+        return View('{{toLowerCase classname}}_form_edit', compact('action_url', 'hidden', '{{toLowerCase classname}}'{{#each relation_array.hasMany}}, '{{toLowerCase relatedmodel}}'{{/each}}))->withModal(true);
+    }
+  
+    return View('{{toLowerCase classname}}_edit', compact('action_url', 'hidden', '{{toLowerCase classname}}'{{#each relation_array.hasMany}}, '{{toLowerCase relatedmodel}}'{{/each}}));      
+    
 
   }
 
@@ -260,7 +217,7 @@ protected ${{relatedmodel}}Repo;
 
     $resource = $this->{{classname}}Repo->findById($id);
 
-    if ($this->checkUserCanEdit($resource)) {
+    if ($this->checkUserCanDelete($resource)) {
         $this->{{classname}}Repo->delete($id);
     }else{
 
@@ -287,9 +244,79 @@ protected ${{relatedmodel}}Repo;
   {
 
 
+    $hidden = $this->mergeHiddenField(['{{toLowerCase ../classname}}_id' => true]);
+    $action_url =  $request->url();
 
-    $hidden_field = ['{{toLowerCase ../classname}}_id' => true];
+    if ($request->ajax()) {
+        return View('{{toLowerCase relatedmodel}}_form_create', compact('action_url', 'hidden') )->withModal(true);
+    }
+    
+    return View('{{toLowerCase relatedmodel}}_create', compact('action_url', 'hidden')  );        
+      
+  }
 
+
+  public function show{{relatedmodel}}(${{toLowerCase ../classname}}_id, Request $request)
+  {
+
+    ${{toLowerCase relatedmodel}} = $this->{{relatedmodel}}Repo->where{{ucFirst ../classname}}Id(${{toLowerCase ../classname}}_id)->getFiltered();
+
+    return View('{{toLowerCase relatedmodel}}_list', compact('{{toLowerCase  relatedmodel}}') );
+
+  }
+
+
+  public function store{{relatedmodel}}(${{toLowerCase ../classname}}_id, Request $request)
+  {
+
+    $resource = {{../classname}}::findOrFail(${{toLowerCase ../classname}}_id);
+
+    $request_new = $request->all();
+
+    if ($this->checkUserCanEdit($resource {{#contains column "user_id"}}, 'id'{{/contains}}))
+    {
+      
+      $request_new['{{toLowerCase ../classname}}_id'] = $resource->id;
+      
+      ${{toLowerCase ../classname}}_new = new {{relatedmodel}}($request_new);
+      ${{toLowerCase ../classname}}_new->save();
+
+    }else{
+      
+      if ($request->ajax()) return [ 'success'  => false ]; 
+      
+      return redirect('{{toLowerCase name}}');
+    
+    }
+
+    if ($request->ajax()) return [ 'success'  => true ];
+
+    return redirect('{{toLowerCase name}}');
+
+
+  }
+
+
+
+{{/each}}
+
+
+// !todo! refactor this on template
+
+
+  private function getCurrentUser()
+  {
+    $auth_user = \Auth::User();
+    $auth_user_role = $auth_user->role->name;
+    $auth_user_id = $auth_user->id;
+    
+    return array('role' => $auth_user_role, 'id' => $auth_user_id);
+  }
+
+  //hide field
+
+  private function mergeHiddenField($hidden_field)
+  {
 
     $shared_hidden = view()->shared('hidden');
 
@@ -298,56 +325,34 @@ protected ${{relatedmodel}}Repo;
       $hidden_field = array_merge($hidden_field, $shared_hidden);      
     }
 
-
-    $action_url =  $request->url();
-
-    //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
-    if ($request->ajax()) {
-        return View('{{toLowerCase relatedmodel}}_form_create', ['modal' => true,'action_url' => $action_url, 'hidden' => $hidden_field]);
-    }else{
-        return View('{{toLowerCase relatedmodel}}_create', ['action_url' => $action_url, 'hidden' => $hidden_field]);        
-    }  
+    return $hidden_field;
   }
 
-  public function store{{relatedmodel}}(${{toLowerCase ../classname}}_id, Request $request)
+  private function checkUserCanDelete($resource, $fk = 'user_id')
   {
-
-    $resource = {{../classname}}::findOrFail(${{toLowerCase ../classname}}_id);
 
     $auth_user = \Auth::User();
     $auth_user_role = $auth_user->role->name;
-    $auth_user_id = $auth_user->id;    
+    $auth_user_id = $auth_user->id;
 
-    $request_new = $request->all();
+    if ( $auth_user_role == 'Admin') return true;
 
-    if ($this->checkUserCanEdit($resource))
-    {
-      
-      {{#contains column "user_id"}}
-      $request_new['user_id'] = $auth_user_id;
-      {{/contains}}
-      $request_new['{{toLowerCase ../classname}}_id'] = $resource->id;
-      
-      ${{toLowerCase ../classname}}_new = new {{relatedmodel}}($request_new);
-      ${{toLowerCase ../classname}}_new->save();
+    if (is_null($resource[$fk])) return false;
 
+    if ($resource[$fk] ==  $auth_user_id ) {
+      return true;
     }else{
-      if ($request->ajax()) return [ 'success'  => false ]; 
-      return Redirect::back();
+      return false;
     }
-
-    if ($request->ajax()) return [ 'success'  => true ];    
-    return Redirect::back();
 
 
   }
 
-{{/each}}
 
-  private function checkUserCanEdit($resource)
+  private function checkUserCanEdit($resource, $fk = 'user_id')
   {
 
-    if (is_null($resource->user_id)) return true;
+    if (is_null($resource[$fk])) return true;
 
     $auth_user = \Auth::User();
     $auth_user_role = $auth_user->role->name;
@@ -358,7 +363,7 @@ protected ${{relatedmodel}}Repo;
     { 
         return true;
     }else{
-      if ($resource->user_id == $auth_user_id ) {
+      if ($resource[$fk] == $auth_user_id ) {
         return true;
       }else{
         return false;
