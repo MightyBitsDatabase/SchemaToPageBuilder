@@ -1,4 +1,3 @@
-
 <?php
 
 /*
@@ -12,30 +11,59 @@
 |
 */
 
-Route::group(['middleware' => ['auth','checkadmin']], function()
+
+{{#each this}}
+
+/**
+ * Router for {{name}}
+ **/
+
+Route::group(['prefix' => '{{toLowerCase name}}', 'middleware' => ['auth','checkadmin']], function()
 {
 
-	{{#each this}}
-	Route::get('{{toLowerCase name}}', '{{classname}}Controller@index');
-	Route::get('{{toLowerCase name}}/create', '{{classname}}Controller@create');
-	Route::post('{{toLowerCase name}}', '{{classname}}Controller@store');
-	Route::get('{{toLowerCase name}}/{id}', '{{classname}}Controller@show');
-	Route::get('{{toLowerCase name}}/{id}/edit', '{{classname}}Controller@edit');
-	Route::put('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
-	Route::patch('{{toLowerCase name}}/{id}', '{{classname}}Controller@update');
-	Route::delete('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
-	Route::get('{{toLowerCase name}}/delete/{id}', '{{classname}}Controller@destroy');
+	//read
+
+	Route::get('/', '{{classname}}Controller@index');
+	Route::get('/create', '{{classname}}Controller@create');
+	Route::get('/{id}', '{{classname}}Controller@show');
+	Route::get('/{id}/edit', '{{classname}}Controller@edit');
 	{{#each relation_array.hasMany}}
-	Route::get('{{toLowerCase ../name}}/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@create{{relatedmodel}}');
-	Route::post('{{toLowerCase ../name}}/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@store{{relatedmodel}}');
+	Route::get('/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@create{{relatedmodel}}');
+	Route::get('/{id}/show/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@show{{relatedmodel}}');
+
 	{{/each}}  
-
-	{{/each}}
-
-	Route::get('/', 'AccountController@index');
 
 
 });
+
+
+Route::group(['prefix' => '{{toLowerCase name}}', 'middleware' => ['auth','checkadmin']], function()
+{	
+
+	//update	
+
+	Route::post('/', '{{classname}}Controller@store');
+	Route::put('/{id}', '{{classname}}Controller@update');
+	Route::patch('/{id}', '{{classname}}Controller@update');
+	Route::delete('/delete/{id}', '{{classname}}Controller@destroy');
+	Route::get('/delete/{id}', '{{classname}}Controller@destroy');
+	{{#each relation_array.hasMany}}
+	Route::post('/{id}/create/{{toLowerCase relatedmodel}}', '{{../classname}}Controller@store{{relatedmodel}}');	
+	{{/each}}  
+
+
+});
+
+
+{{/each}}
+
+
+
+Route::group(['middleware' => ['auth','checkadmin']], function()
+{
+	Route::get('/', 'AccountController@index');
+});
+
 /*
 |
 |	Auth Controllers
