@@ -2,3 +2,9 @@ node_modules
 build
 build-test
 skema
+marko.js
+marko.php
+test.js
+test.php
+test.txt
+.DS_Store

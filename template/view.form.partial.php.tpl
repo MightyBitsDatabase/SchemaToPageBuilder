@@ -13,11 +13,21 @@
 {{#ifcond name '!==' 'id'}}
 <div class="form-group">
   <label for="{{name}}">{{ucFirst name}}</label>
+
   {{#ifcond type '!==' 'datetime'}}
+  
+  {{#ifcond uploadfile '===' true}}
+  {!! Form::file('{{name}}', null, ['class' => 'form-control']) !!}  
+  {{else}}
   {!! Form::text('{{name}}', null, ['class' => 'form-control']) !!}
+  {{/ifcond}}
+
   {{else}}
   {!! Form::text('{{name}}', null, ['class' => 'form-control datepicker']) !!}
   {{/ifcond}}
+
+
+
 </div>
 {{/ifcond}}
 {{/if}}

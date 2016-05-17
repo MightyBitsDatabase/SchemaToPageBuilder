@@ -1,6 +1,6 @@
 var hb = require('handlebars');
-var fs = require('fs');
-var _ = require('lodash');
+var fs = require('fs-extra');
+var _  = require('lodash');
 
 var util = {};
 util.fileIO = {};
@@ -34,10 +34,13 @@ util.getTimeFile = function() {
 
 
 util.fileIO.writeFile = function(fileName, stringText) {
-    fs.writeFile(fileName, stringText, function(err) {
+    fs.ensureFile(fileName, function(){
+            fs.writeFile(fileName, stringText, function(err) {
         if (err) return console.log(err);
         //console.log('write error ' + fileName);
     });
+    });
+
 };
 
 
@@ -177,12 +180,16 @@ var generateRelation = function(model) {
             classname: relation.relatedmodel
         });
         var column = [];
+        var column_full = [];
 
 
         _(table.column).forEach(function(col) {
             column.push(col.name);
         }).value();
 
+        _(table.column).forEach(function(col) {
+            column_full.push(col);
+        }).value();
 
         if (typeof relation_array[relation.relationtype] === 'undefined') relation_array[relation.relationtype] = [];
         relation_array[relation.relationtype].push({
@@ -192,7 +199,8 @@ var generateRelation = function(model) {
             'table_class': table.classname.toLowerCase(),
             'relation_name': relation.name,
             'foreignkeys': relation.relatedmodel.toLowerCase(),
-            'column': column
+            'column': column,
+            'column_full' : column_full
         });
     }).value();
     return relation_array;

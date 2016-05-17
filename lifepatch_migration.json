@@ -1,7 +1,7 @@
 {
     "project": {
         "name" : "Lifepatch Accounting System",
-        "skema" : "./skema/Akun6.skema"
+        "skema" : "./skema/Akun8.skema"
     },
     "path": {
         "template_path": "./template/",
@@ -15,13 +15,12 @@
     },
     "table": [
         {
-            "name": "repository",
-            "src": "{template_path}repository.php.tpl",
-            "dst": "{laravel_path}/app/Repositories/",
-            "filename": "{uclassname}Repository.php"
-        }
-
+            "name": "migration",
+            "src": "{template_path}migration.php.tpl",
+            "dst": "{migration_path}",
+            "filename": "mysql/{filetime}_create_{name}_table.php"
+        }                    
     ],
-    "main": [
+    "main": [          
     ]
 }

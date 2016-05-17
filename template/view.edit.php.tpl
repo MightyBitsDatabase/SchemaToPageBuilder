@@ -14,7 +14,7 @@
   <div class="panel-body">
     <div class="row">
       <div class="col-lg-12">
-        @include("{{toLowerCase classname}}_form_edit")
+        @include("{{toLowerCase classname}}.form_edit")
       </div>
     </div>
     {{#each relation_array.hasMany}}
@@ -27,7 +27,7 @@
     </h2>
   </div>
   <div class="col-lg-12">
-    @include('{{toLowerCase relatedmodel}}_list', ['{{toLowerCase relatedmodel}}' => ${{toLowerCase relatedmodel}}])
+    @include('{{toLowerCase relatedmodel}}.list', ['{{toLowerCase relatedmodel}}' => ${{toLowerCase relatedmodel}}])
   </div>
 </div>
 {{/each}}

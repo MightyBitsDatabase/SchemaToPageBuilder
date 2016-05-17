@@ -14,7 +14,7 @@
 		<div class="alert-box">
 		</div>
 		<div id="Table{{classname}}" content-url="\{{ action('{{classname}}Controller@index')}}" >
-			@include("{{toLowerCase classname}}_table")
+			@include("{{toLowerCase classname}}.table")
 
 		</div>
 	</div>

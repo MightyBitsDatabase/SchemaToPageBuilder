@@ -66,10 +66,10 @@ protected ${{relatedmodel}}Repo;
 
 
     if ($request->ajax()) {
-      return View('{{toLowerCase classname}}_table', compact('{{toLowerCase classname}}'));
+      return View('{{toLowerCase classname}}.table', compact('{{toLowerCase classname}}'));
     }
 
-      return View('{{toLowerCase classname}}_index', compact('{{toLowerCase classname}}'));
+      return View('{{toLowerCase classname}}.index', compact('{{toLowerCase classname}}'));
   
   }
 
@@ -83,10 +83,10 @@ protected ${{relatedmodel}}Repo;
   {
 
       if ($request->ajax()) {
-        return View('{{toLowerCase classname}}_form_create')->withModal(true);
+        return View('{{toLowerCase classname}}.form_create')->withModal(true)->with('modalTitle', 'Create {{ classname }}');
       }
 
-      return View('{{toLowerCase classname}}_create');        
+      return View('{{toLowerCase classname}}.create');        
   }
 
 
@@ -109,6 +109,18 @@ protected ${{relatedmodel}}Repo;
       $request_new = $request->all();
       $request_new['user_id'] = $current_user['id'];
     }
+
+
+    {{#each column}}
+    {{#ifcond uploadfile '===' true}}
+    //todo refactor this
+    ${{ucFirst name }}File = $request_new['{{name}}'];
+    $filename =  pathinfo(${{ucFirst name }}File->getClientOriginalName(), PATHINFO_FILENAME).'-'.uniqid().'.'.${{ucFirst name }}File->getClientOriginalExtension();
+    ${{ucFirst name }}File->move( public_path("uploads/posts") , $filename );
+    $request_new['{{ name }}'] = $filename;
+    {{/ifcond}}
+    {{/each}}
+
 
     {{classname}}::create($request_new);
 
@@ -138,7 +150,7 @@ protected ${{relatedmodel}}Repo;
     ${{toLowerCase relatedmodel}} = $this->{{relatedmodel}}Repo->where{{ucFirst ../classname}}Id($id)->getFiltered();
     {{/each}}
 
-    return View('{{toLowerCase classname}}_show', compact('{{toLowerCase classname}}' {{#each relation_array.hasMany}},'{{toLowerCase relatedmodel}}'{{/each}}));
+    return View('{{toLowerCase classname}}.show', compact('{{toLowerCase classname}}' {{#each relation_array.hasMany}},'{{toLowerCase relatedmodel}}'{{/each}}));
 
   }
 
@@ -165,10 +177,10 @@ protected ${{relatedmodel}}Repo;
 
     //return "create a new {{relatedmodel}} that belongs to {{../classname}} " . $id;
     if ($request->ajax()) {
-        return View('{{toLowerCase classname}}_form_edit', compact('action_url', 'hidden', '{{toLowerCase classname}}'{{#each relation_array.hasMany}}, '{{toLowerCase relatedmodel}}'{{/each}}))->withModal(true);
+        return View('{{toLowerCase classname}}.form_edit', compact('action_url', 'hidden', '{{toLowerCase classname}}'{{#each relation_array.hasMany}}, '{{toLowerCase relatedmodel}}'{{/each}}))->withModal(true)->with('modalTitle', 'Edit {{ classname }}');
     }
   
-    return View('{{toLowerCase classname}}_edit', compact('action_url', 'hidden', '{{toLowerCase classname}}'{{#each relation_array.hasMany}}, '{{toLowerCase relatedmodel}}'{{/each}}));      
+    return View('{{toLowerCase classname}}.edit', compact('action_url', 'hidden', '{{toLowerCase classname}}'{{#each relation_array.hasMany}}, '{{toLowerCase relatedmodel}}'{{/each}}));      
     
 
   }
@@ -248,10 +260,10 @@ protected ${{relatedmodel}}Repo;
     $action_url =  $request->url();
 
     if ($request->ajax()) {
-        return View('{{toLowerCase relatedmodel}}_form_create', compact('action_url', 'hidden') )->withModal(true);
+        return View('{{toLowerCase relatedmodel}}.form_create', compact('action_url', 'hidden') )->withModal(true)->with('modalTitle', 'Create {{relatedmodel}}');
     }
     
-    return View('{{toLowerCase relatedmodel}}_create', compact('action_url', 'hidden')  );        
+    return View('{{toLowerCase relatedmodel}}.create', compact('action_url', 'hidden')  );        
       
   }
 
@@ -261,7 +273,7 @@ protected ${{relatedmodel}}Repo;
 
     ${{toLowerCase relatedmodel}} = $this->{{relatedmodel}}Repo->where{{ucFirst ../classname}}Id(${{toLowerCase ../classname}}_id)->getFiltered();
 
-    return View('{{toLowerCase relatedmodel}}_list', compact('{{toLowerCase  relatedmodel}}') );
+    return View('{{toLowerCase relatedmodel}}.list', compact('{{toLowerCase  relatedmodel}}') );
 
   }
 
@@ -278,6 +290,17 @@ protected ${{relatedmodel}}Repo;
       
       $request_new['{{toLowerCase ../classname}}_id'] = $resource->id;
       
+
+      {{#each column_full}}
+      {{#ifcond uploadfile '===' true}}
+      //todo refactor this
+      ${{ucFirst name }}File = $request_new['{{name}}'];
+      $filename =  pathinfo(${{ucFirst name }}File->getClientOriginalName(), PATHINFO_FILENAME).'-'.uniqid().'.'.${{ucFirst name }}File->getClientOriginalExtension();
+      ${{ucFirst name }}File->move( public_path("uploads/posts") , $filename );
+      $request_new['{{ name }}'] = $filename;
+      {{/ifcond}}
+      {{/each}}
+
       ${{toLowerCase ../classname}}_new = new {{relatedmodel}}($request_new);
       ${{toLowerCase ../classname}}_new->save();
 
@@ -296,6 +319,12 @@ protected ${{relatedmodel}}Repo;
 
   }
 
+  //todo...
+  public function delete{{relatedmodel}}(${{toLowerCase relatedmodel}}_id, ${{toLowerCase ../classname}}_id, Request $request)
+  {
+
+
+  }
 
 
 {{/each}}

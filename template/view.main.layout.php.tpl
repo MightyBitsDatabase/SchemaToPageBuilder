@@ -56,7 +56,6 @@ background-image: none !important;
     min-height: 16.43px;
     padding: 15px;
     border-bottom: 1px solid #CCC;
-    background-color: #F0F0F0;
     color: #505050;
 }
 
@@ -70,8 +69,8 @@ background-image: none !important;
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-default  navbar-static-top">
-            <div class="container">
+        <nav class="navbar navbar-default  navbar-inverse navbar-static-top">
+            <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>

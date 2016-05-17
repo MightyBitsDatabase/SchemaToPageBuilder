@@ -1,5 +1,7 @@
 <?php namespace App\Repositories;
 
+// use App\Repositories\\{{classname}}Repository;
+
 {{#if namespace~}}
     use {{namespace}}\\{{classname}};
 {{else~}}

@@ -15,42 +15,6 @@
     },
     "table": [
         {
-            "name": "migration",
-            "src": "{template_path}migration.php.tpl",
-            "dst": "{migration_path}",
-            "filename": "{filetime}_create_{name}_table.php"
-        },
-        {
-            "name": "request",
-            "src": "{template_path}request.php.tpl",
-            "dst": "{laravel_path}/app/Http/Requests/",
-            "filename": "{uclassname}Request.php"
-        },        
-        {
-            "name": "seeding",
-            "src": "{template_path}seed.php.tpl",
-            "dst": "{seed_path}",
-            "filename": "{name}_seed.php"
-        },
-        {
-            "name": "model",
-            "src": "{template_path}model.php.tpl",
-            "dst": "{laravel_path}{model_path}",
-            "filename": "{uclassname}.php"
-        },
-        {
-            "name": "controller",
-            "src": "{template_path}controller.php.tpl",
-            "dst": "{laravel_path}{controller_path}",
-            "filename": "{uclassname}Controller.php"
-        },
-        {
-            "name": "repository",
-            "src": "{template_path}repository.php.tpl",
-            "dst": "{laravel_path}/app/Repositories/",
-            "filename": "{uclassname}Repository.php"
-        },
-        {
             "name": "listview",
             "src": "{template_path}view.list.php.tpl",
             "dst": "{laravel_path}{view_path}",
@@ -115,32 +79,14 @@
             "src": "{template_path}view.edit.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "{classname}/edit.blade.php"
-        }                            
+        }                         
     ],
     "main": [
-        {
-            "name": "routes",
-            "src": "{template_path}routes.php.tpl",
-            "dst": "{laravel_path}{route_path}",
-            "filename": "routes.php"
-        },
-        {
-            "name": "seedmain",
-            "src": "{template_path}seeder.php.tpl",
-            "dst": "{seed_path}",
-            "filename": "DatabaseSeeder.php"
-        },
-        {
+              {
             "name": "main_layout",
             "src": "{template_path}view.main.layout.php.tpl",
             "dst": "{laravel_path}{view_path}",
             "filename": "main_layout.blade.php"
-        },
-        {
-            "name": "listhelper",
-            "src": "{template_path}helper.list.php.tpl",
-            "dst": "{laravel_path}/app/Helpers/",
-            "filename": "ListHelper.php"
-        }            
+        }         
     ]
 }

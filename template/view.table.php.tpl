@@ -18,9 +18,11 @@
       <tr>
            {{#each column}}
            {{#ifcond name '!==' 'id'}}
+        
         {{#if relation}}
-        <td>\{{ $row->{{toLowerCase relation.name}}_{{relation.relatedcolumn}} }}</td>
+        <td><a href="\{{ action('{{ucFirst relation.name}}Controller@show', $row->{{toLowerCase name}} ) }}"  >\{{ $row->{{toLowerCase relation.name}}_{{relation.relatedcolumn}} }}</a></td>
         {{else}}
+
         <td>\{{ $row->{{name}} }}</td>
         {{/if}}
            {{/ifcond}}

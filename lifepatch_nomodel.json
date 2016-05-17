@@ -33,12 +33,6 @@
             "filename": "{name}_seed.php"
         },
         {
-            "name": "model",
-            "src": "{template_path}model.php.tpl",
-            "dst": "{laravel_path}{model_path}",
-            "filename": "{uclassname}.php"
-        },
-        {
             "name": "controller",
             "src": "{template_path}controller.php.tpl",
             "dst": "{laravel_path}{controller_path}",
@@ -54,68 +48,68 @@
             "name": "listview",
             "src": "{template_path}view.list.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/list.blade.php"
+            "filename": "{classname}_list.blade.php"
         },
         {
             "name": "indexview",
             "src": "{template_path}view.index.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/index.blade.php"
+            "filename": "{classname}_index.blade.php"
         },
         {
             "name": "formpartial",
             "src": "{template_path}view.form.partial.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/form_partial.blade.php"
+            "filename": "{classname}_form_partial.blade.php"
         },
         {
             "name": "formrow",
             "src": "{template_path}view.form.row.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/form_row.blade.php"
+            "filename": "{classname}_form_row.blade.php"
         },        
         {
             "name": "formedit",
             "src": "{template_path}view.form.edit.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/form_edit.blade.php"
+            "filename": "{classname}_form_edit.blade.php"
         },   
         {
             "name": "formcreate",
             "src": "{template_path}view.form.create.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/form_create.blade.php"
+            "filename": "{classname}_form_create.blade.php"
         },   
         {
             "name": "modal",
             "src": "{template_path}view.modal.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/modal.blade.php"
+            "filename": "{classname}_modal.blade.php"
         },                          
         {
             "name": "showview",
             "src": "{template_path}view.show.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/show.blade.php"
+            "filename": "{classname}_show.blade.php"
         },           
         {
             "name": "createview",
             "src": "{template_path}view.create.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/create.blade.php"
+            "filename": "{classname}_create.blade.php"
         },
         {
             "name": "editview",
             "src": "{template_path}view.table.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/table.blade.php"
+            "filename": "{classname}_table.blade.php"
         },
         {
             "name": "tableview",
             "src": "{template_path}view.edit.php.tpl",
             "dst": "{laravel_path}{view_path}",
-            "filename": "{classname}/edit.blade.php"
-        }                            
+            "filename": "{classname}_edit.blade.php"
+        }                         
     ],
     "main": [
         {
