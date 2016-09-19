@@ -24,12 +24,14 @@ var readConfigFromFile = function(filename) {
         template.src = util.replaceWithHash(template.src, path_hash);
         template.dst = util.replaceWithHash(template.dst, path_hash);
         template.filename = util.replaceWithHash(template.filename, path_hash);
+        template.build = hb.compile(util.fileIO.openFile(template.src));
     });
 
     _.forEach(template_main, function(template) {
         template.src = util.replaceWithHash(template.src, path_hash);
         template.dst = util.replaceWithHash(template.dst, path_hash);
         template.filename = util.replaceWithHash(template.filename, path_hash);
+        template.build = hb.compile(util.fileIO.openFile(template.src));
     });
 
     return config;
@@ -138,12 +140,8 @@ var addModelAttribToColumn = function(model) {
     model.model = model_var;
 };
 
-var compileTemplateToString = function(template_file, column) {
-    var template_var = column;
-    var template = util.fileIO.openFile(template_file);
-    var pageBuilder = hb.compile(template);
-    var pageText = pageBuilder(template_var);
-    return pageText;
+var compileTemplateToString = function(template_builder, template_var) {
+    return template_builder(template_var);
 };
 
 
@@ -201,7 +199,7 @@ var writeTemplate = function(database, templates) {
                     //console.log(entity.name, entity.column)
                 }
 
-            var compiled_template = compileTemplateToString(template.src, entity);
+            var compiled_template = compileTemplateToString(template.build, entity);
             
             file_hash = {
                 classname: entity.classname.toLowerCase(),
@@ -223,7 +221,7 @@ var writeTemplate = function(database, templates) {
     console.log("---------------------------------------");
 
     _.forEach(templates.main, function(template) {
-        var compiled_template = compileTemplateToString(template.src, database);
+        var compiled_template = compileTemplateToString(template.build, database);
         console.log("Writing " + template.name + " to " + template.dst + template.filename);
         //util.fileIO.writeFile(template.dst + template.filename, compiled_template);
     });
