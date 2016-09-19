@@ -1,66 +1,38 @@
-<?php 
+<?php
 
-{{#if namespace}}
-namespace {{namespace}};
-{{else}}
-namespace App;
-{{/if}}
+namespace {{{NAMESPACE_MODEL}}};
 
-use Illuminate\Database\Eloquent\Model;
+use {{{NAMESPACE_MODEL_EXTEND}}} as Model;
+{{{SOFT_DELETE_IMPORT}}}
+{{{DOCS}}}
+class {{{MODEL_NAME}}} extends Model
+{
+{{{SOFT_DELETE}}}
+    public $table = '{{{TABLE_NAME}}}';
+    {{{TIMESTAMPS}}}
+{{{SOFT_DELETE_DATES}}}
+{{{PRIMARY}}}
+    public $fillable = [
+    {{{FIELDS}}}
+    ];
 
-{{#if softdelete}}
-use SoftDeletingTrait;
-{{/if}}
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+    {{{CAST}}}
+    ];
 
-class {{classname}} extends Model {
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
+    public static $rules = [
+        {{{RULES}}}
+    ];
 
-  {{#if model.fillable}}
-  protected $fillable = array({{{csv model.fillable}}});
-  {{/if}}
-  {{#if model.guarded}}
-  protected $guarded = array({{{csv model.guarded}}});
-  {{/if}}
-  {{#if model.visible}}
-  protected $visible = array({{{csv model.visible}}});
-  {{/if}}
-  {{#if model.hidden}}
-  protected $hidden = array({{{csv model.hidden}}});
-  {{/if}}
-
-  protected $table = '{{toLowerCase name}}';
-  
-  {{#if timestamp}}
-  public $timestamps = true;
-  {{else}}
-  public $timestamps = false;
-  {{/if}}
-
-  {{#each column}}
-
-  public function {{this.name}}()
-  {
-    return $this->{{this.name}};
-  }
-
-  {{/each}}
-
-  //
-  //relation
-  //
-  
-  {{#each model.relations}}
-
-  public function {{this.name}}()
-  {
-    {{#if this.usenamespace}}    
-    return $this->{{this.relationtype}}('\{{this.usenamespace}}\\{{this.relatedmodel}}');
-    {{else}}
-    return $this->{{this.relationtype}}('\App\\{{this.relatedmodel}}');
-    {{/if}}
-  }
-
-  {{/each}}
-
+    {{{RELATIONS}}}
 }
-
-
