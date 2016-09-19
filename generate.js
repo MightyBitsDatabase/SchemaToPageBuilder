@@ -1,157 +1,22 @@
-var hb = require('handlebars');
 var fs = require('fs-extra');
 var _  = require('lodash');
+var hb  = require('./handlebar.js');
+var util = require('./util.js');
 
-var util = {};
-util.fileIO = {};
-
-
-
-util.replaceWithHash = function(str, hash) {
-    var string = str,
-        key;
-    for (key in hash) string = string.replace(new RegExp('\\{' + key + '\\}', 'gm'), hash[key]);
-    return string;
-}
-
-
-util.readJsonFromFile = function(filename) {
-    return JSON.parse(fs.readFileSync(filename, "utf8"));
-}
-
-util.getTimeFile = function() {
-
-    var d = new Date();
-    var curr_date = d.getDate();
-    var curr_month = d.getMonth();
-    var curr_year = d.getFullYear();
-    var curr_hour = d.getHours().toString();
-    var curr_min = d.getMinutes().toString();
-    var curr_sec = d.getSeconds().toString();
-
-    return (curr_year + '_' + curr_month + "_" + curr_date + '_' + curr_hour + curr_min + curr_sec);
-};
-
-
-util.fileIO.writeFile = function(fileName, stringText) {
-    fs.ensureFile(fileName, function(){
-            fs.writeFile(fileName, stringText, function(err) {
-        if (err) return console.log(err);
-        //console.log('write error ' + fileName);
-    });
-    });
-
-};
-
-
-
-util.fileIO.openFile = function(fileName) {
-    return fs.readFileSync(fileName, "utf8");
-};
-
-
-(function() {
-
-    function checkCondition(v1, operator, v2) {
-        switch (operator) {
-            case '==':
-                return (v1 == v2);
-            case '===':
-                return (v1 === v2);
-            case '!==':
-                return (v1 !== v2);
-            case '<':
-                return (v1 < v2);
-            case '<=':
-                return (v1 <= v2);
-            case '>':
-                return (v1 > v2);
-            case '>=':
-                return (v1 >= v2);
-            case '&&':
-                return (v1 && v2);
-            case '||':
-                return (v1 || v2);
-            default:
-                return false;
-        }
-    }
-
-
-    hb.registerHelper('csv', function(context) {
-        var ret = "";
-        for (var i = 0, j = context.length; i < j; i++) {
-            ret = ret + "'" + (context[i]) + "'";
-            if (i < (j - 1)) ret = ret + ', ';
-        }
-        return ret;
-    });
-
-    hb.registerHelper('toLowerCase', function(value) {
-        if (value) {
-            return new hb.SafeString(value.toLowerCase());
-        } else {
-            return '';
-        }
-    });
-
-    hb.registerHelper('ucFirst', function(value) {
-        if (value) {
-            return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-        } else {
-            return '';
-        }
-    });
-
-    hb.registerHelper('cameLize', function(value) {
-        if (value) {
-            var array_val = value.split('_');
-            var newval = [];
-            _.forEach(array_val, function(val){
-                newval.push(val.charAt(0).toUpperCase() + val.slice(1).toLowerCase());
-            });     
-
-            return newval.join("");
-        } else {
-            return '';
-        }
-    });
-
-    hb.registerHelper('ife', function(value, valueb) {
-        if (value) {
-            return new hb.SafeString(valueb);
-        } else {
-            return '';
-        }
-    });
-
-    hb.registerHelper('ifc', function(v1, v2, options) {
-        if (v1 === v2) {
-            return options.fn(this);
-        }
-        return options.inverse(this);
-    });
-
-    hb.registerHelper('contains', function(v1, v2, options) {
-        if (_.contains(v1, v2)) {
-            return options.fn(this);
-        }
-        return options.inverse(this);
-    });
-
-    hb.registerHelper('ifcond', function(v1, operator, v2, options) {
-        return checkCondition(v1, operator, v2) ? options.fn(this) : options.inverse(this);
-    });
-}());
+var tmp_controller = require('./controller_template');
+var tmp_model = require('./model_template');
 
 /// template
-
 var readConfigFromFile = function(filename) {
     var config = util.readJsonFromFile(filename);
     var path_hash = config.path;
     var template_table = config.table;
     var template_main = config.main;
 
+    var curr_time = util.getTimeFile();
+    if (process.argv[3] === 'notime') {
+        curr_time = "";
+    }
 
     path_hash.filetime = curr_time; //util.getTimeFile();
 
@@ -173,15 +38,14 @@ var readConfigFromFile = function(filename) {
 
 var generateRelation = function(model) {
     var relation_array = {};
-
-
     _(model.relation).forEach(function(relation) {
+
         var table = _.findWhere(db_json, {
             classname: relation.relatedmodel
         });
+
         var column = [];
         var column_full = [];
-
 
         _(table.column).forEach(function(col) {
             column.push(col.name);
@@ -202,7 +66,9 @@ var generateRelation = function(model) {
             'column': column,
             'column_full' : column_full
         });
+
     }).value();
+
     return relation_array;
 };
 
@@ -227,12 +93,9 @@ var addSeedingToColumn = function(model) {
     var seeds_source = model.seeding;
     var columns = model.column;
 
-    var template_var = model;
-
-    var seeds = [];
-
     var template = util.fileIO.openFile("./template/seed.php.tpl");
-
+    var template_var = model;
+    var seeds = [];
 
     for (var i = seeds_source.length - 1; i >= 0; i--) {
         var row = {};
@@ -293,24 +156,62 @@ var injectTemplateVariable = function(database) {
     });
 }
 
+
+var concatMemberName = function(array, name)
+{
+    var tmp = [];
+    _.forEach(array, function(member) { 
+        tmp.push(member[name])
+    })
+
+    return tmp;
+}
+
+var joinArray = function(array)
+{
+    var tmparr = _.map(array, function(member){ return "\'" + member + "\'" ; });
+    return tmparr.join(',\n')
+}
+
 var writeTemplate = function(database, templates) {
 
+    _.forEach(database, function(entity) {
 
-    _.forEach(database, function(table) {
-        console.log("");
-        console.log("Processing " + table.name + " table template");
-        console.log("---------------------------------------");
+        //console.log("");
+        //console.log("Processing " + table.name + " table template");
+        //console.log("---------------------------------------");
 
+
+        // controller, model, view, repo templates
         _.forEach(templates.table, function(template) {
-            var compiled_template = compileTemplateToString(template.src, table);
+            
+            if (template.name === 'model') 
+                {
+                    var new_model = _.clone(tmp_model)
+    
+                    new_model.MODEL_NAME = entity.classname
+                    new_model.TABLE_NAME = entity.name
+                    new_model.FIELDS = joinArray(entity.model.fillable)
+
+                    console.log('model --->', new_model)
+                }
+
+            if (template.name === 'controller') 
+                {
+                    //console.log(entity.name, entity.column)
+                }
+
+            var compiled_template = compileTemplateToString(template.src, entity);
+            
             file_hash = {
-                classname: table.classname.toLowerCase(),
-                uclassname: table.classname,
-                name: table.name.toLowerCase()
+                classname: entity.classname.toLowerCase(),
+                uclassname: entity.classname,
+                name: entity.name.toLowerCase()
             };
+
             var template_filename = util.replaceWithHash(template.filename, file_hash);
-            console.log("Writing " + template.name + " to " + template.dst + template_filename);
-            util.fileIO.writeFile(template.dst + template_filename, compiled_template);
+            //console.log("Writing " + template.name + " to " + template.dst + template_filename);
+            //util.fileIO.writeFile(template.dst + template_filename, compiled_template);
 
         });
     });
@@ -324,17 +225,11 @@ var writeTemplate = function(database, templates) {
     _.forEach(templates.main, function(template) {
         var compiled_template = compileTemplateToString(template.src, database);
         console.log("Writing " + template.name + " to " + template.dst + template.filename);
-        util.fileIO.writeFile(template.dst + template.filename, compiled_template);
+        //util.fileIO.writeFile(template.dst + template.filename, compiled_template);
     });
 
     console.log("");
 
-}
-
-
-var curr_time = util.getTimeFile();
-if (process.argv[3] === 'notime') {
-    curr_time = "";
 }
 
 var template_config = readConfigFromFile(process.argv[2]);
@@ -347,8 +242,5 @@ console.log("------------------------------");
 injectTemplateVariable(db_json);
 writeTemplate(db_json, template_config);
 
-console.log("done....\n");
 
-// fileIO.writeFile('./build/seeds/'  +  'DatabaseSeeder'  + '.php', generateDBseederMain(db_json));   
-// fileIO.writeFile( routes_path  +  'routes'  + '.php', generateRoute(db_json));   
-// fileIO.writeFile(views_path  +  'main_layout' + '.' + 'blade'  + '.php', generateLayoutTemplate(db_json));
+console.log("done....\n");

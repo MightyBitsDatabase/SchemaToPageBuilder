@@ -5,7 +5,7 @@
     },
     "path": {
         "template_path": "./template/",
-        "laravel_path": "/Applications/AMPPS/www/laracoba",
+        "laravel_path": "./laracoba",
         "view_path": "/resources/views/",
         "model_path": "/app/",
         "controller_path": "/app/Http/Controllers/",
