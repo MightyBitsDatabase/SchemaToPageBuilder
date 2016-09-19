@@ -12,6 +12,7 @@ var readConfigFromFile = function(filename) {
     var path_hash = config.path;
     var template_table = config.table;
     var template_main = config.main;
+    var template_fields = config.fields;
 
     var curr_time = util.getTimeFile();
     if (process.argv[3] === 'notime') {
@@ -20,18 +21,27 @@ var readConfigFromFile = function(filename) {
 
     path_hash.filetime = curr_time; //util.getTimeFile();
 
+    var replaceConfigHash = function(config_element, config_path_hash)
+    {
+        config_element.src = util.replaceWithHash(config_element.src, config_path_hash);
+        config_element.dst = util.replaceWithHash(config_element.dst, config_path_hash);
+        config_element.filename = util.replaceWithHash(config_element.filename, config_path_hash);
+        config_element.build = hb.compile(util.fileIO.openFile(config_element.src));
+    }
+
+    replaceConfigHash(config.routes, path_hash)
+
+
+    _.forEach(template_fields, function(template) {
+        replaceConfigHash(template, path_hash)
+    });
+
     _.forEach(template_table, function(template) {
-        template.src = util.replaceWithHash(template.src, path_hash);
-        template.dst = util.replaceWithHash(template.dst, path_hash);
-        template.filename = util.replaceWithHash(template.filename, path_hash);
-        template.build = hb.compile(util.fileIO.openFile(template.src));
+        replaceConfigHash(template, path_hash)
     });
 
     _.forEach(template_main, function(template) {
-        template.src = util.replaceWithHash(template.src, path_hash);
-        template.dst = util.replaceWithHash(template.dst, path_hash);
-        template.filename = util.replaceWithHash(template.filename, path_hash);
-        template.build = hb.compile(util.fileIO.openFile(template.src));
+        replaceConfigHash(template, path_hash);
     });
 
     return config;
@@ -111,7 +121,6 @@ var addSeedingToColumn = function(model) {
 };
 
 var addModelAttribToColumn = function(model) {
-
     var columns = model.column;
     var relations = model.relation;
 
@@ -133,7 +142,7 @@ var addModelAttribToColumn = function(model) {
         visible: _visible,
         hidden: _hidden,
         namespace: "App",
-        softdelete: false,
+        softdelete: model.softdelete,
         relations: relations,
     };
 
@@ -145,8 +154,8 @@ var compileTemplateToString = function(template_builder, template_var) {
 };
 
 
-var injectTemplateVariable = function(database) {
-    _.forEach(database, function(model) {
+var injectTemplateVariable = function(schema) {
+    _.forEach(schema, function(model) {
         model.relation_array = generateRelation(model);
         addRelationToColumn(model);
         addSeedingToColumn(model);
@@ -165,54 +174,93 @@ var concatMemberName = function(array, name)
     return tmp;
 }
 
-var joinArray = function(array)
+var concatMemberKeyValue = function(array, name, value)
 {
-    var tmparr = _.map(array, function(member){ return "\'" + member + "\'" ; });
-    return tmparr.join(',\n')
+    var tmp = [];
+    _.forEach(array, function(member) { 
+        tmp.push("\t\'" + member[name] + "\'" +  ' => ' + "\'" + member[value] + "\'")
+    })
+
+    return tmp.join(',\n');
 }
 
-var writeTemplate = function(database, templates) {
+var joinArray = function(array)
+{
+    var tmparr = _.map(array, function(member){ return "\t\'" + member + "\'" ; });
+    return tmparr.join(',\t\n')
+}
 
-    _.forEach(database, function(entity) {
+var writeTemplate = function(schema, templates) {
+
+    var template_routes = ""
+
+    _.forEach(schema, function(entity) {
 
         //console.log("");
         //console.log("Processing " + table.name + " table template");
         //console.log("---------------------------------------");
-
-
         // controller, model, view, repo templates
-        _.forEach(templates.table, function(template) {
-            
-            if (template.name === 'model') 
-                {
-                    var new_model = _.clone(tmp_model)
-    
-                    new_model.MODEL_NAME = entity.classname
-                    new_model.TABLE_NAME = entity.name
-                    new_model.FIELDS = joinArray(entity.model.fillable)
 
-                    console.log('model --->', new_model)
-                }
+        var infyom = _.clone(tmp_model)
 
-            if (template.name === 'controller') 
-                {
-                    //console.log(entity.name, entity.column)
-                }
+        infyom.MODEL_NAME = entity.classname
+        infyom.TABLE_NAME = entity.name
+        infyom.FIELDS = joinArray(entity.model.fillable)
+        infyom.CAST = concatMemberKeyValue(entity.column, 'name', 'type')
 
-            var compiled_template = compileTemplateToString(template.build, entity);
-            
-            file_hash = {
-                classname: entity.classname.toLowerCase(),
-                uclassname: entity.classname,
-                name: entity.name.toLowerCase()
-            };
+        if (entity.softdelete === false)
+        {
+            infyom.SOFT_DELETE_IMPORT = ""
+            infyom.SOFT_DELETE = ""
+            infyom.SOFT_DELETE_DATES = ""
+        }
 
-            var template_filename = util.replaceWithHash(template.filename, file_hash);
-            //console.log("Writing " + template.name + " to " + template.dst + template_filename);
-            //util.fileIO.writeFile(template.dst + template_filename, compiled_template);
+        infyom.MODEL_NAME = entity.classname
+        infyom.MODEL_NAME_CAMEL = entity.classname
+        infyom.MODEL_NAME_PLURAL_CAMEL = entity.classname
+        infyom.MODEL_NAME_PLURAL_SNAKE = entity.classname
+        infyom.MODEL_NAME_HUMAN = entity.classname
 
-        });
+        //template each item fields
+        var template_fields = ""        
+        _.forEach(entity.column, function(item) {
+            var field_array = {
+                FIELD_NAME: item.name,
+                FIELD_NAME_TITLE: item.name
+            }
+            if ( item.type === 'string' ) {
+                template_fields += templates.fields.text.build(field_array)
+                template_fields += "\n\n"
+            }
+        })
+
+        //store compiled fields template
+        infyom.FIELDS_COMPILED = template_fields;
+
+        //merge configuration to our schema
+        _.merge(entity, infyom)
+
+        schema.ROUTES_COMPILED += templates.routes.build(entity) + "\n"
     });
+
+    //util.fileIO.writeFile(templates.routes.dst + templates.routes.filename, template_routes);
+
+    _.forEach(schema, function(entity) {
+        var file_hash = {
+            classname: entity.classname.toLowerCase(),
+            uclassname: entity.classname,
+            name: entity.name.toLowerCase()
+        };
+        //save each template
+        _.forEach(templates.table, function(template) {
+            var compiled_template = compileTemplateToString(template.build, entity);            
+            var template_filename = util.replaceWithHash(template.filename, file_hash);
+            // console.log("Writing " + template.name + " to " + template.dst + template_filename);
+            util.fileIO.writeFile(template.dst + template_filename, compiled_template);
+        })
+    })
+
+
 
     console.log("");
     console.log("");
@@ -221,9 +269,9 @@ var writeTemplate = function(database, templates) {
     console.log("---------------------------------------");
 
     _.forEach(templates.main, function(template) {
-        var compiled_template = compileTemplateToString(template.build, database);
-        console.log("Writing " + template.name + " to " + template.dst + template.filename);
-        //util.fileIO.writeFile(template.dst + template.filename, compiled_template);
+        var compiled_template = compileTemplateToString(template.build, schema);
+        //console.log("Writing " + template.name + " to " + template.dst + template.filename);
+        util.fileIO.writeFile(template.dst + template.filename, compiled_template);
     });
 
     console.log("");
