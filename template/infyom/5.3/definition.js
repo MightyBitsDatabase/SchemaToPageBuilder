@@ -119,7 +119,7 @@
         {
             "name": "migration",
             "src": "{template_path}/migration/migration.php.tpl",
-            "dst": "{migration_path}/{migration_path}",
+            "dst": "{laravel_path}/{migration_path}",
             "filename": "{filetime}_create_{name}_table.php"
         }                          
     ],
