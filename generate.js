@@ -6,9 +6,14 @@ var util = require('./util.js');
 var tmp_controller = require('./controller_template');
 var tmp_model = require('./model_template');
 
+
+var Laragen = {}
+
+Laragen.output = "./build-test"
+
 /// template
-var readConfigFromFile = function(filename) {
-    var config = util.readJsonFromFile(filename);
+var readConfigFromFile = function(def_directory) {
+    var config = util.readJsonFromFile(def_directory + "/definition.js");
     var path_hash = config.path;
     var template_table = config.table;
     var template_main = config.main;
@@ -24,9 +29,10 @@ var readConfigFromFile = function(filename) {
     var replaceConfigHash = function(config_element, config_path_hash)
     {
         config_element.src = util.replaceWithHash(config_element.src, config_path_hash);
-        config_element.dst = util.replaceWithHash(config_element.dst, config_path_hash);
+        config_element.dst =  util.replaceWithHash(config_element.dst, config_path_hash);
         config_element.filename = util.replaceWithHash(config_element.filename, config_path_hash);
-        config_element.build = hb.compile(util.fileIO.openFile(config_element.src));
+        config_element.build =  hb.compile(util.fileIO.openFile(def_directory + "/" +config_element.src));
+        console.log(config_element.dst)
     }
 
     replaceConfigHash(config.routes, path_hash)
@@ -102,22 +108,22 @@ var addRelationToColumn = function(model) {
 };
 
 var addSeedingToColumn = function(model) {
-    var seeds_source = model.seeding;
-    var columns = model.column;
+    // var seeds_source = model.seeding;
+    // var columns = model.column;
 
-    var template = util.fileIO.openFile("./template/seed.php.tpl");
-    var template_var = model;
-    var seeds = [];
+    // var template = util.fileIO.openFile("./template/seed.php.tpl");
+    // var template_var = model;
+    // var seeds = [];
 
-    for (var i = seeds_source.length - 1; i >= 0; i--) {
-        var row = {};
-        for (var j = seeds_source[i].length - 1; j >= 0; j--) {
-            row[columns[j].name] = seeds_source[i][j].content;
-        }
-        seeds.push(row);
-    }
+    // for (var i = seeds_source.length - 1; i >= 0; i--) {
+    //     var row = {};
+    //     for (var j = seeds_source[i].length - 1; j >= 0; j--) {
+    //         row[columns[j].name] = seeds_source[i][j].content;
+    //     }
+    //     seeds.push(row);
+    // }
 
-    template_var.seeds = seeds;
+    // template_var.seeds = seeds;
 };
 
 var addModelAttribToColumn = function(model) {
@@ -271,7 +277,9 @@ var writeTemplate = function(schema, templates) {
             var compiled_template = compileTemplateToString(template.build, entity);            
             var template_filename = util.replaceWithHash(template.filename, file_hash);
             // console.log("Writing " + template.name + " to " + template.dst + template_filename);
-            util.fileIO.writeFile(template.dst + template_filename, compiled_template);
+            util.fileIO.writeFile(Laragen.output + "/" + template.dst + "/" + template_filename, compiled_template);
+            // console.log(Laragen.output + "/" + template.dst + "/" + template_filename)
+           console.log(template.dst)
         })
     })
 
@@ -285,19 +293,19 @@ var writeTemplate = function(schema, templates) {
     _.forEach(templates.main, function(template) {
         var compiled_template = compileTemplateToString(template.build, schema);
         //console.log("Writing " + template.name + " to " + template.dst + template.filename);
-        util.fileIO.writeFile(template.dst + template.filename, compiled_template);
+        util.fileIO.writeFile(Laragen.output + "/" + template.dst + "/" + template.filename, compiled_template);
     });
 
     console.log("");
 
 }
 
-var template_config = readConfigFromFile(process.argv[2]);
-var db_json = util.readJsonFromFile(template_config.project.skema);
+var template_config = readConfigFromFile("./template/infyom/5.3");
+var db_json = util.readJsonFromFile(process.argv[2]);
 
-console.log("\n\n------------------------------");
-console.log(template_config.project.name);
-console.log("------------------------------");
+// console.log("\n\n------------------------------");
+// console.log(template_config.project.name);
+// console.log("------------------------------");
 
 injectTemplateVariable(db_json);
 writeTemplate(db_json, template_config);

@@ -56,7 +56,7 @@ tmp_model.API_VERSION = "v1"
 //custom
 
 tmp_model.FIELDS_COMPILED = "" //store compiled fields template
-
+tmp_model.ROUTES_COMPILED = ""
 
 // /**
 //      * @return \Illuminate\Database\Eloquent\Relations\$RELATIONSHIP_CLASS$
