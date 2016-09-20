@@ -219,20 +219,33 @@ var writeTemplate = function(schema, templates) {
         infyom.MODEL_NAME_HUMAN = entity.classname
 
         //template each item fields
-        var template_fields = ""        
+        var template_fields = ""
+        var field_headers = ""
+        var field_body = ""
+        var field_body = ""
+        var show_fields = ""
+
         _.forEach(entity.column, function(item) {
-            var field_array = {
-                FIELD_NAME: item.name,
-                FIELD_NAME_TITLE: item.name
-            }
+
+            infyom.FIELD_NAME = item.name
+            infyom.FIELD_NAME_TITLE = item.name
+
             if ( item.type === 'string' ) {
-                template_fields += templates.fields.text.build(field_array)
+                template_fields += templates.fields.text.build(infyom)
                 template_fields += "\n\n"
             }
+
+            field_headers += templates.fields.field_headers.build(infyom) + "\n"
+            field_body += templates.fields.field_body.build(infyom) + "\n"
+            show_fields += templates.fields.show_field.build(infyom) + "\n\n"
+
         })
 
         //store compiled fields template
         infyom.FIELDS_COMPILED = template_fields;
+        infyom.FIELD_HEADERS = field_headers
+        infyom.FIELD_BODY = field_body
+        infyom.SHOW_FIELDS = show_fields
 
         //merge configuration to our schema
         _.merge(entity, infyom)
