@@ -34,5 +34,17 @@ class {{{MODEL_NAME}}} extends Model
         {{{RULES}}}
     ];
 
-    {{{RELATIONS}}}
+    
+  {{#each model.relations}}
+
+  public function {{this.name}}()
+  {
+    {{#if this.usenamespace}}    
+    return $this->{{this.relationtype}}('\\{{this.usenamespace}}\\{{this.relatedmodel}}');
+    {{else}}
+    return $this->{{this.relationtype}}('\App\\{{this.relatedmodel}}');
+    {{/if}}
+  }
+
+  {{/each}}
 }
