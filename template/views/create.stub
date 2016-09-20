@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            $MODEL_NAME_HUMAN$
+            {{{MODEL_NAME_HUMAN}}}
         </h1>
     </section>
     <div class="content">
@@ -12,9 +12,9 @@
 
             <div class="box-body">
                 <div class="row">
-                    {!! Form::open(['route' => '$ROUTE_NAMED_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.store']) !!}
+                    {!! Form::open(['route' => '{{{ROUTE_NAMED_PREFIX}}}{{{MODEL_NAME_PLURAL_CAMEL}}}.store']) !!}
 
-                        @include('$VIEW_PREFIX$$MODEL_NAME_PLURAL_SNAKE$.fields')
+                        @include('{{{VIEW_PREFIX}}}{{{MODEL_NAME_PLURAL_SNAKE}}}.fields')
 
                     {!! Form::close() !!}
                 </div>
