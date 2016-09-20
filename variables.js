@@ -1,7 +1,5 @@
 var tmp_model = {};
 
-
-
 tmp_model.NAMESPACE_APP  = "App\\";
 tmp_model.NAMESPACE_REPOSITORY  = "App\\Repositories";
 tmp_model.NAMESPACE_MODEL = "App\\Models"
