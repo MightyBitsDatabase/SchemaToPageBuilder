@@ -201,6 +201,7 @@ generatorApp.writeTemplate = function(schema, templates) {
 
     _.forEach(schema, function(entity) {
 
+
         var infyom = _.clone(template_variables)
 
         infyom.MODEL_NAME = entity.classname
@@ -229,14 +230,16 @@ generatorApp.writeTemplate = function(schema, templates) {
         var show_fields = ""
 
         _.forEach(entity.column, function(item) {
-
+            
             infyom.FIELD_NAME = item.name
             infyom.FIELD_NAME_TITLE = item.name
 
-            if ( item.type === 'string' ) {
-                template_fields += templates.fields.text.build(infyom)
-                template_fields += "\n\n"
+            if (typeof item.html_input !== 'undefined')
+            {   
+                template_fields += templates.fields[item.html_input].build(infyom)
+                template_fields += "\n\n"              
             }
+
 
             field_headers += templates.fields.field_headers.build(infyom) + "\n"
             field_body += templates.fields.field_body.build(infyom) + "\n"
@@ -264,6 +267,8 @@ generatorApp.writeTemplate = function(schema, templates) {
     // controller, model, view, repo templates
 
     _.forEach(schema, function(entity) {
+
+
         var file_hash = {
             classname: entity.classname.toLowerCase(),
             uclassname: entity.classname,

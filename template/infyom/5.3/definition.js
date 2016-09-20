@@ -15,6 +15,36 @@
             "dst": "{laravel_path}/{view_path}",
             "filename" : "{uclassname}.text.stub"
         },
+        "textarea": {
+            "src": "{template_path}/fields/textarea.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.textarea.stub"
+        },   
+        "email": {
+            "src": "{template_path}/fields/email.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.email.stub"
+        },  
+        "date": {
+            "src": "{template_path}/fields/date.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.date.stub"
+        }, 
+        "number": {
+            "src": "{template_path}/fields/number.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.number.stub"
+        }, 
+        "password": {
+            "src": "{template_path}/fields/password.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.password.stub"
+        },  
+        "file": {
+            "src": "{template_path}/fields/file.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.file.stub"
+        },    
         "field_headers": {
             "src": "{template_path}/views/table_header.stub",
             "dst": "{laravel_path}/{view_path}",
