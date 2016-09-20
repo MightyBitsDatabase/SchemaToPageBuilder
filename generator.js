@@ -196,11 +196,11 @@ generatorApp.joinArray = function(array)
 generatorApp.writeTemplate = function(schema, templates) {
 
     var template_routes = ""
-    
+
     schema.ROUTES_COMPILED = ""
+    schema.MENU_BODY = ""
 
     _.forEach(schema, function(entity) {
-
 
         var infyom = _.clone(template_variables)
 
@@ -226,7 +226,6 @@ generatorApp.writeTemplate = function(schema, templates) {
         var template_fields = ""
         var field_headers = ""
         var field_body = ""
-        var field_body = ""
         var show_fields = ""
 
         _.forEach(entity.column, function(item) {
@@ -239,7 +238,6 @@ generatorApp.writeTemplate = function(schema, templates) {
                 template_fields += templates.fields[item.html_input].build(infyom)
                 template_fields += "\n\n"              
             }
-
 
             field_headers += templates.fields.field_headers.build(infyom) + "\n"
             field_body += templates.fields.field_body.build(infyom) + "\n"
@@ -257,7 +255,7 @@ generatorApp.writeTemplate = function(schema, templates) {
         _.merge(entity, infyom)
 
         schema.ROUTES_COMPILED += templates.routes.build(entity) + "\n"
-
+        schema.MENU_BODY += templates.fields.menu_template.build(entity) + "\n"
 
     })
 
@@ -267,7 +265,6 @@ generatorApp.writeTemplate = function(schema, templates) {
     // controller, model, view, repo templates
 
     _.forEach(schema, function(entity) {
-
 
         var file_hash = {
             classname: entity.classname.toLowerCase(),
@@ -283,11 +280,12 @@ generatorApp.writeTemplate = function(schema, templates) {
             // console.log(generatorSettings.output + "/" + template.dst + "/" + template_filename)
            console.log(template.dst)
         })
+
+
     })
 
     console.log("")
     console.log("")
-
     console.log("Processing main template")
     console.log("---------------------------------------")
 

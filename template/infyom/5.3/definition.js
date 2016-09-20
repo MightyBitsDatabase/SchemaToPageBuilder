@@ -45,6 +45,11 @@
             "dst": "{laravel_path}/{view_path}",
             "filename" : "{uclassname}.file.stub"
         },    
+        "menu_template": {
+            "src": "{template_path}/layouts/menu_template.stub",
+            "dst": "{laravel_path}/{view_path}",
+            "filename" : "{uclassname}.menu_template.stub"
+        },    
         "field_headers": {
             "src": "{template_path}/views/table_header.stub",
             "dst": "{laravel_path}/{view_path}",
@@ -67,6 +72,7 @@
             "filename": "web.php"
     },
     "table": [
+    
         {
             "name" : "show_fields",
             "src": "{template_path}/views/show_fields.stub",
@@ -154,6 +160,12 @@
         }                          
     ],
     "main": [
+        {
+            "name" : "menu",
+            "src": "{template_path}/layouts/menu.stub",
+            "dst": "{view_path}/layouts",
+            "filename" : "menu.blade.php"
+        },     
         {
             "name": "routes",
             "src": "{template_path}/routes/routes.all.php.tpl",
