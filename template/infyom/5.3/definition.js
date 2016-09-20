@@ -5,8 +5,8 @@
         "view_path": "resources/views",
         "model_path": "app/Models",
         "controller_path": "/app/Http/Controllers",
-        "route_path": "app/Http/",
-        "migration_path": "migrations",
+        "route_path": "routes",
+        "migration_path": "database/migrations",
         "seed_path": "seeds"
     },
     "fields": {
