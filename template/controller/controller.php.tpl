@@ -33,8 +33,7 @@ class {{{MODEL_NAME}}}Controller extends AppBaseController
         $this->{{{MODEL_NAME_CAMEL}}}Repository->pushCriteria(new RequestCriteria($request));
         ${{{MODEL_NAME_PLURAL_CAMEL}}} = $this->{{{MODEL_NAME_CAMEL}}}Repository->{{{RENDER_TYPE}}};
 
-        return view('{{{VIEW_PREFIX}}}{{{MODEL_NAME_PLURAL_SNAKE}}}.index')
-            ->with('{{{MODEL_NAME_PLURAL_CAMEL}}}', ${{{MODEL_NAME_PLURAL_CAMEL}}});
+        return view('{{{VIEW_PREFIX}}}{{{MODEL_NAME_PLURAL_SNAKE}}}.index')->with('{{{MODEL_NAME_PLURAL_CAMEL}}}', ${{{MODEL_NAME_PLURAL_CAMEL}}});
     }
 
     /**
