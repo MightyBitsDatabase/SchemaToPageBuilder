@@ -193,13 +193,10 @@ var joinArray = function(array)
 var writeTemplate = function(schema, templates) {
 
     var template_routes = ""
+    
+    schema.ROUTES_COMPILED = ""
 
     _.forEach(schema, function(entity) {
-
-        //console.log("");
-        //console.log("Processing " + table.name + " table template");
-        //console.log("---------------------------------------");
-        // controller, model, view, repo templates
 
         var infyom = _.clone(tmp_model)
 
@@ -241,9 +238,14 @@ var writeTemplate = function(schema, templates) {
         _.merge(entity, infyom)
 
         schema.ROUTES_COMPILED += templates.routes.build(entity) + "\n"
+
+
     });
 
-    //util.fileIO.writeFile(templates.routes.dst + templates.routes.filename, template_routes);
+    //console.log("");
+    //console.log("Processing " + table.name + " table template");
+    //console.log("---------------------------------------");
+    // controller, model, view, repo templates
 
     _.forEach(schema, function(entity) {
         var file_hash = {
@@ -259,7 +261,6 @@ var writeTemplate = function(schema, templates) {
             util.fileIO.writeFile(template.dst + template_filename, compiled_template);
         })
     })
-
 
 
     console.log("");
