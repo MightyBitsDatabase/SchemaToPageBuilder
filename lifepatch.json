@@ -10,7 +10,7 @@
         "model_path": "/app/",
         "controller_path": "/app/Http/Controllers/",
         "route_path": "/app/Http/",
-        "migration_path": "./build/migrations/",
+        "migration_path": "./laracoba/migrations/",
         "seed_path": "./build/seeds/"
     },
     "fields": {
@@ -30,7 +30,7 @@
             "name" : "fields",
             "src": "{template_path}views/fields.stub",
             "dst": "{laravel_path}{view_path}",
-            "filename" : "{uclassname}.blade.php"
+            "filename" : "{classname}.fields.blade.php"
         },
         {
             "name": "request_create",
@@ -71,7 +71,7 @@
         },
         {
             "name": "migration",
-            "src": "{template_path}migration.php.tpl",
+            "src": "{template_path}migration/migration.php.tpl",
             "dst": "{migration_path}",
             "filename": "{filetime}_create_{name}_table.php"
         },
@@ -146,8 +146,8 @@
         {
             "name": "routes",
             "src": "{template_path}routes/routes.all.php.tpl",
-            "dst": "{laravel_path}{route_path}routes2.php",
-            "filename": "routes.php"
+            "dst": "{laravel_path}{route_path}",
+            "filename": "web.php"
         },
         {
             "name": "seedmain",
