@@ -297,13 +297,16 @@ generatorApp.writeTemplate = function(schema, templates) {
     console.log("")
 }
 
-var template_config = generatorApp.readConfigFromFile("./template/infyom/5.3")
+generatorApp.generateFromSkemaTo = function(skema_file, destination_dir) {
 
-generatorSettings.skema = util.readJsonFromFile(process.argv[2])
-generatorSettings.output = process.argv[3]
+    var template_definition_folder = generatorApp.readConfigFromFile("/Users/xcorex/Documents/Projects/Electron/LaravelSchemaDesigner/asset/app/js/generator/template/infyom/5.3")
 
-generatorApp.injectTemplateVariable(generatorSettings.skema)
-generatorApp.writeTemplate(generatorSettings.skema, template_config)
+    generatorSettings.skema = util.readJsonFromFile(skema_file)
+    generatorSettings.output = destination_dir
+    
+    generatorApp.injectTemplateVariable(generatorSettings.skema)
+    generatorApp.writeTemplate(generatorSettings.skema, template_definition_folder)
 
+}
 
-console.log("done....\n")
+module.exports = generatorApp
