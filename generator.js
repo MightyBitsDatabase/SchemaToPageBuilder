@@ -2,6 +2,7 @@ var fs = require('fs-extra')
 var _  = require('lodash')
 var hb  = require('./helper/handlebar.js')
 var util = require('./helper/util.js')
+const path = require('path');
 
 var template_variables = require('./variables')
 
@@ -29,7 +30,7 @@ generatorApp.readConfigFromFile = function(def_directory) {
         config_element.src = util.replaceWithHash(config_element.src, config_path_hash)
         config_element.dst =  util.replaceWithHash(config_element.dst, config_path_hash)
         config_element.filename = util.replaceWithHash(config_element.filename, config_path_hash)
-        config_element.build =  hb.compile(util.fileIO.openFile(def_directory + "/" +config_element.src))
+        config_element.build =  hb.compile(util.fileIO.openFile(def_directory + path.sep +config_element.src))
         console.log(config_element.dst)
     }
 
@@ -276,8 +277,8 @@ generatorApp.writeTemplate = function(schema, templates) {
             var compiled_template = generatorApp.compileTemplateToString(template.build, entity)            
             var template_filename = util.replaceWithHash(template.filename, file_hash)
             // console.log("Writing " + template.name + " to " + template.dst + template_filename)
-            util.fileIO.writeFile(generatorSettings.output + "/" + template.dst + "/" + template_filename, compiled_template)
-            // console.log(generatorSettings.output + "/" + template.dst + "/" + template_filename)
+            util.fileIO.writeFile(generatorSettings.output + path.sep + template.dst + path.sep + template_filename, compiled_template)
+            // console.log(generatorSettings.output + path.sep + template.dst + path.sep + template_filename)
            console.log(template.dst)
         })
 
@@ -292,7 +293,7 @@ generatorApp.writeTemplate = function(schema, templates) {
     _.forEach(templates.main, function(template) {
         var compiled_template = generatorApp.compileTemplateToString(template.build, schema)
         //console.log("Writing " + template.name + " to " + template.dst + template.filename)
-        util.fileIO.writeFile(generatorSettings.output + "/" + template.dst + "/" + template.filename, compiled_template)
+        util.fileIO.writeFile(generatorSettings.output + path.sep + template.dst + path.sep + template.filename, compiled_template)
     })
     console.log("")
 }
