@@ -31,7 +31,7 @@ generatorApp.readConfigFromFile = function(def_directory) {
         config_element.dst =  util.replaceWithHash(config_element.dst, config_path_hash)
         config_element.filename = util.replaceWithHash(config_element.filename, config_path_hash)
         config_element.build =  hb.compile(util.fileIO.openFile(def_directory + path.sep +config_element.src))
-        console.log(config_element.dst)
+        //console.log(config_element.dst)
     }
 
     replaceConfigHash(config.routes, path_hash)
@@ -97,7 +97,7 @@ generatorApp.addRelationToColumn = function(model) {
             var rel = _.findWhere(model.relation, {
                 name: rel_to_find
             })
-            if (rel.relationtype === "belongsTo") {
+            if (typeof rel !== 'undefined' && rel.relationtype === "belongsTo") {
                 item.relation = rel
             }
         }
@@ -133,11 +133,24 @@ generatorApp.addModelAttribToColumn = function(model) {
     var _visible = []
     var _hidden = []
 
+
+    var pushArr = function(varArr,destArr) 
+    {
+        for (var i in varArr)
+        {
+            destArr.push(varArr[i])
+        }
+    }
+
     _(columns).forEach(function(col) {
-        if (col.fillable === true) _fillable.push(col.name)
-        if (col.guarded === true) _guarded.push(col.name)
-        if (col.visible === true) _visible.push(col.name)
-        if (col.hidden === true) _hidden.push(col.name)
+        var name = [col.name]
+        console.log('kator',col.type)
+        if(col.type === 'location') name = [col.name + '_latitude', col.name + '_longitude']
+
+        if (col.fillable === true) pushArr(name,_fillable)
+        if (col.guarded === true) pushArr(name,_guarded)
+        if (col.visible === true) pushArr(name,_visible)
+        if (col.hidden === true) pushArr(name,_hidden)
     }).value()
 
     var model_var = {
@@ -229,22 +242,22 @@ generatorApp.writeTemplate = function(schema, templates) {
         var field_body = ""
         var show_fields = ""
 
-        _.forEach(entity.column, function(item) {
+        // _.forEach(entity.column, function(item) {
             
-            infyom.FIELD_NAME = item.name
-            infyom.FIELD_NAME_TITLE = item.name
+        //     infyom.FIELD_NAME = item.name
+        //     infyom.FIELD_NAME_TITLE = item.name
 
-            if (typeof item.html_input !== 'undefined')
-            {   
-                template_fields += templates.fields[item.html_input].build(infyom)
-                template_fields += "\n\n"              
-            }
+        //     if (typeof templates.fields[item.html_input].build !== 'undefined')
+        //     {   
+        //         template_fields += templates.fields[item.html_input].build(infyom)
+        //         template_fields += "\n\n"              
+        //     }
 
-            field_headers += templates.fields.field_headers.build(infyom) + "\n"
-            field_body += templates.fields.field_body.build(infyom) + "\n"
-            show_fields += templates.fields.show_field.build(infyom) + "\n\n"
+        //     field_headers += templates.fields.field_headers.build(infyom) + "\n"
+        //     field_body += templates.fields.field_body.build(infyom) + "\n"
+        //     show_fields += templates.fields.show_field.build(infyom) + "\n\n"
 
-        })
+        // })
 
         //store compiled fields template
         infyom.FIELDS_COMPILED = template_fields
@@ -257,13 +270,8 @@ generatorApp.writeTemplate = function(schema, templates) {
 
         schema.ROUTES_COMPILED += templates.routes.build(entity) + "\n"
         schema.MENU_BODY += templates.fields.menu_template.build(entity) + "\n"
-
+        // console.log(schema.MENU_BODY)
     })
-
-    //console.log("")
-    //console.log("Processing " + table.name + " table template")
-    //console.log("---------------------------------------")
-    // controller, model, view, repo templates
 
     _.forEach(schema, function(entity) {
 
@@ -279,7 +287,7 @@ generatorApp.writeTemplate = function(schema, templates) {
             // console.log("Writing " + template.name + " to " + template.dst + template_filename)
             util.fileIO.writeFile(generatorSettings.output + path.sep + template.dst + path.sep + template_filename, compiled_template)
             // console.log(generatorSettings.output + path.sep + template.dst + path.sep + template_filename)
-           console.log(template.dst)
+           // console.log(template.dst)
         })
 
 
@@ -301,7 +309,7 @@ generatorApp.writeTemplate = function(schema, templates) {
 
 generatorApp.generateFromSkemaJsonTo = function(skema_json, destination_dir) {
     
-    var template_definition_folder = generatorApp.readConfigFromFile("/Users/xcorex/Documents/Projects/Electron/LaravelSchemaDesigner/asset/app/js/generator/template/infyom/5.3")
+    var template_definition_folder = generatorApp.readConfigFromFile("/Users/xcorex/Documents/Projects/Electron/LaravelSchemaDesigner/asset/app/js/generator/template/backpack/5.3")
     generatorSettings.skema = skema_json
     generatorSettings.output = destination_dir
 
@@ -311,7 +319,7 @@ generatorApp.generateFromSkemaJsonTo = function(skema_json, destination_dir) {
 
 generatorApp.generateFromSkemaFileTo = function(skema_file, destination_dir) {
 
-    var template_definition_folder = generatorApp.readConfigFromFile("/Users/xcorex/Documents/Projects/Electron/LaravelSchemaDesigner/asset/app/js/generator/template/infyom/5.3")
+    var template_definition_folder = generatorApp.readConfigFromFile("/Users/xcorex/Documents/Projects/Electron/LaravelSchemaDesigner/asset/app/js/generator/template/backpack/5.3")
 
     generatorSettings.skema = util.readJsonFromFile(skema_file)
     generatorSettings.output = destination_dir

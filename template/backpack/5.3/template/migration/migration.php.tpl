@@ -13,8 +13,13 @@ class Create{{ucFirst name}}Table extends Migration {
   public function up()
   {
     Schema::create('{{{toLowerCase name}}}', function(Blueprint $table) {
-
+      
+      {{~#if increment}}$table->increments('id');{{/if}}  
       {{#each column}}
+        {{#ifcond type '===' 'location'}}
+        $table->string('{{{name}}}_latitude');
+        $table->string('{{{name}}}_longitude');
+        {{else}}
         {{#ifc length "" ~}}$table->{{{type}}}('{{{name}}}'){{else}}$table->{{{type}}}('{{{name}}}', {{{length}}}){{~/ifc ~}}
         {{~ife ai "->increments()"}}            
         {{~ife pk "->primary()"}}      
@@ -22,11 +27,9 @@ class Create{{ucFirst name}}Table extends Migration {
         {{~ife ui "->unsigned()"}}
         {{~ife in "->index()"}}
         {{~ife un "->unique()"}}        
-        {{~#if defaultvalue}}->default("{{defaultvalue}}"){{/if}};
-        {{/each}}
-      {{~#if timestamp}}
-        $table->timestamps();
-      {{/if}}
+        {{~#if defaultvalue}}->default("{{defaultvalue}}"){{/if}};{{/ifcond}}
+        {{/each}}      
+        {{#if timestamp}}$table->timestamps();{{/if}}
       
     });
   }

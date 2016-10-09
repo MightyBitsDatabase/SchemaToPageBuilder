@@ -17,14 +17,48 @@ class {{{MODEL_NAME}}}CrudController extends CrudController {
         $this->crud->setEntityNameStrings('{{{MODEL_NAME}}}', '{{{MODEL_NAME}}}');
 
         {{#each column}}
+        {{#ifcond type '!==' 'location'}}
         $this->crud->addColumn('{{{name}}}');
+        {{/ifcond}}
 
         {{~#if fillable}}
-
+        {{#ifcond type '===' 'location'}}
+        $this->crud->addColumn('{{{name}}}_latitude');
+        $this->crud->addColumn('{{{name}}}_longitude');
+        $this->crud->addField([
+            'name' => '{{{name}}}_latitude',
+            'label' => '{{{name}}}_latitude',
+        ]);
+        $this->crud->addField([
+            'name' => '{{{name}}}_longitude',
+            'label' => '{{{name}}}_longitude',
+        ]);
+        {{ else }}
+        {{#ifcond html_input '===' 'textarea'}}
+        $this->crud->addField([
+            'name' => '{{{name}}}',
+            'label' => '{{{name}}}',
+            'type' => 'summernote'            
+        ]);
+        {{/ifcond}}
+        {{#ifcond html_input '===' 'text'}}
         $this->crud->addField([
             'name' => '{{{name}}}',
             'label' => '{{{name}}}',            
-        ]);
+        ]);        
+        {{/ifcond}}
+        {{#ifcond html_input '===' 'file'}}
+        $this->crud->addField(
+        [   // Upload
+            'name' => '{{{name}}}',
+            'label' => '{{{name}}}',
+            'type' => 'upload',
+            'upload' => true,
+            'disk' => 'uploads' // if you store files in the /public folder, please ommit this; if you store them in /storage or S3, please specify it;
+        ]
+        );        
+        {{/ifcond}}
+        {{/ifcond}}
         {{/if}}    
         {{/each}}
     }
