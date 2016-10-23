@@ -23,7 +23,20 @@ class Update{{{MODEL_NAME}}}Request extends \Backpack\CRUD\app\Http\Requests\Cru
     public function rules()
     {
         return [
-         {{{RULES}}}
+            {{#each column}}
+            {{#ifcond type '===' 'location'}}
+            {{#ifcond validation '!==' 'required'}}
+            '{{{name}}}_latitude' => 'required',
+            '{{{name}}}_longitude' => 'required',
+            {{/ifcond}}
+            {{ else }}
+            {{#ifcond name '!==' 'id'}}
+            {{#ifcond validation '!==' 'required'}}
+            '{{{name}}}' => 'required',
+            {{/ifcond}}
+            {{/ifcond}}  
+            {{/ifcond}}      
+            {{/each}}
         ];
     }
 

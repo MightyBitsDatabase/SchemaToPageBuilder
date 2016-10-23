@@ -28,11 +28,20 @@ class {{{MODEL_NAME}}}CrudController extends CrudController {
         $this->crud->addField([
             'name' => '{{{name}}}_latitude',
             'label' => '{{{name}}}_latitude',
+            'attributes' => ['id' => '{{{name}}}_latitude']
         ]);
         $this->crud->addField([
             'name' => '{{{name}}}_longitude',
             'label' => '{{{name}}}_longitude',
+            'attributes' => ['id' => '{{{name}}}_longitude']            
         ]);
+
+        $this->crud->addField([
+            'name' => '{{{name}}}',
+            'label' => '{{{name}}}',
+            'type' => 'location-select'            
+        ]);
+
         {{ else }}
         {{#ifcond html_input '===' 'textarea'}}
         $this->crud->addField([

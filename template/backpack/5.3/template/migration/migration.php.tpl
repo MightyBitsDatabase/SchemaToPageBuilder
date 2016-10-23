@@ -14,7 +14,6 @@ class Create{{ucFirst name}}Table extends Migration {
   {
     Schema::create('{{{toLowerCase name}}}', function(Blueprint $table) {
       
-      {{~#if increment}}$table->increments('id');{{/if}}  
       {{#each column}}
         {{#ifcond type '===' 'location'}}
         $table->string('{{{name}}}_latitude');
