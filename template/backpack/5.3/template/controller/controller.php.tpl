@@ -56,6 +56,7 @@ class {{{MODEL_NAME}}}CrudController extends CrudController {
             'label' => '{{{name}}}',            
         ]);        
         {{/ifcond}}
+
         {{#ifcond html_input '===' 'file'}}
         $this->crud->addField(
         [   // Upload
@@ -67,6 +68,20 @@ class {{{MODEL_NAME}}}CrudController extends CrudController {
         ]
         );        
         {{/ifcond}}
+
+
+        {{#ifcond html_input '===' 'imageupload'}}
+        $this->crud->addField([ // image
+            'label' => "{{{name}}}",
+            'name' => "{{{name}}}",
+            'type' => 'image',
+            'upload' => true,
+            'crop' => true, // set to true to allow cropping, false to disable
+            'aspect_ratio' => 1, // ommit or set to 0 to allow any aspect ratio
+        ]);
+        {{/ifcond}}
+
+
         {{/ifcond}}
         {{/if}}    
         {{/each}}

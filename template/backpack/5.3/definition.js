@@ -66,5 +66,13 @@
             "dst": "{laravel_path}/routes",
             "filename" : "web.php"
         }                
+    ],
+    "presentation": [
+        {
+            "name": "map",
+            "src": "{template_path}/routes/routes_all.php",
+            "dst": "{laravel_path}/routes",
+            "filename" : "web.php"            
+        }
     ]
 }

@@ -17,6 +17,7 @@ generatorApp.readConfigFromFile = function(def_directory) {
     var template_table = config.table
     var template_main = config.main
     var template_fields = config.fields
+    var template_presentation = config.presentation
 
     var curr_time = util.getTimeFile()
     if (process.argv[3] === 'notime') {
@@ -45,6 +46,10 @@ generatorApp.readConfigFromFile = function(def_directory) {
     })
 
     _.forEach(template_main, function(template) {
+        replaceConfigHash(template, path_hash)
+    })
+
+    _.forEach(template_presentation, function(template) {
         replaceConfigHash(template, path_hash)
     })
 
@@ -216,6 +221,8 @@ generatorApp.writeTemplate = function(schema, templates) {
 
     _.forEach(schema, function(entity) {
 
+        console.log('wew', schema.type)
+
         var infyom = _.clone(template_variables)
 
         infyom.MODEL_NAME = entity.classname
@@ -302,6 +309,19 @@ generatorApp.writeTemplate = function(schema, templates) {
         var compiled_template = generatorApp.compileTemplateToString(template.build, schema)
         //console.log("Writing " + template.name + " to " + template.dst + template.filename)
         util.fileIO.writeFile(generatorSettings.output + path.sep + template.dst + path.sep + template.filename, compiled_template)
+    })
+
+    console.log("Processing Presentation")
+    console.log("---------------------------------------")
+
+    _.forEach(templates.presentation, function(template) {        
+        _.forEach(schema, function(entity) {
+            if (entity.type === 'presentation' && entity.category === template.name)
+            {
+                var compiled_template = generatorApp.compileTemplateToString(template.build, entity)
+                util.fileIO.writeFile(generatorSettings.output + path.sep + template.dst + path.sep + template.filename, compiled_template)
+            }
+        })
     })
     console.log("")
 }
